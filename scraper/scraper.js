@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const yaml = require('js-yaml');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
