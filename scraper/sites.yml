@@ -1,0 +1,23 @@
+---
+sites:
+  - name: Wet City
+    url: http://wetcitybrewing.com/
+    selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
+  - name: Max's Taphouse
+    url: http://maxs.com/
+    selector: '#sidebar .content ul > li'
+  - name: Brass Tap
+    url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
+    selector: '.beer .beerlisting span'
+  - name: The Wine Source
+    url: https://www.beermenus.com/places/14642-the-wine-source
+    selector: '#on_tap li.pure-list-item h3 > a'
+  - name: Waverly Brewing Co
+    url: http://waverlybrewingcompany.com/on-tap/
+    selector: '.beer > .beer-details > p.beer-name > a'
+  - name: Frisco's Taphouse - Columbia
+    url: http://www.friscogrille.com/cmobile-alt.php
+    selector: '.name'
+  - name: Frisco's Taphouse - Crofton
+    url: http://www.friscogrille.com/wcmobile-alt.php
+    selector: '.name'
