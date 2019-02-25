@@ -1,0 +1,7 @@
+type Beer {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  location: String!
+}
