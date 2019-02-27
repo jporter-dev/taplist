@@ -24,7 +24,7 @@ function main() {
             })
             .catch(e => {
               console.log(site.name, e);
-              process.exit();
+              process.exit(1);
             });
         });
       });
