@@ -3,6 +3,7 @@
 const yaml = require("js-yaml");
 const puppeteer = require("puppeteer");
 const isWsl = require("is-wsl");
+const process = require("process");
 const path = require("path");
 const fs = require("fs");
 
@@ -16,10 +17,15 @@ function main() {
     void (async () => {
       let promises = data.sites.map(site => {
         return new Promise(resolve => {
-          parseSite(site).then(beers => {
-            db = db.concat(beers);
-            resolve();
-          });
+          parseSite(site)
+            .then(beers => {
+              db = db.concat(beers);
+              resolve();
+            })
+            .catch(e => {
+              console.log(site.name, e);
+              process.exit();
+            });
         });
       });
       Promise.all(promises).then(() =>
