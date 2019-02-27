@@ -1,4 +1,18 @@
 ---
+users:
+  - name: Josh
+    username: -josh
+  - name: Neil
+    username: Neil
+  - name: Brendan
+    username: BrendanGannon
+  - name: Mary
+    username: MaryJBalt
+  - name: Alyssa
+    username: onceuponalyssa
+  - name: Tyler
+    username: TylerKephart
+
 sites:
   - name: Wet City
     url: http://wetcitybrewing.com/

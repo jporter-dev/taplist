@@ -9,7 +9,7 @@ function main() {
   // Get document, or throw exception on error
   try {
     let data = yaml.load(
-      fs.readFileSync(path.resolve(__dirname, "sites.yml"), "utf8")
+      fs.readFileSync(path.resolve(__dirname, "config.yml"), "utf8")
     );
     let db = [];
     void (async () => {

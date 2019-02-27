@@ -5,8 +5,13 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    search: null,
     taplist: require("../public/taplist.json")
   },
-  mutations: {},
+  mutations: {
+    SET_SEARCH(state, payload) {
+      state.search = payload;
+    }
+  },
   actions: {}
 });

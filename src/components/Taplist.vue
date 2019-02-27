@@ -16,6 +16,7 @@
       :items="taplist"
       :search="search"
       :rows="10"
+      :rows-per-page-items="[25, 50, 100]"
     >
       <template slot="items" slot-scope="props">
         <td>{{ props.item.name }}</td>
@@ -32,12 +33,11 @@ export default {
   name: "TapList",
   data() {
     return {
-      search: null,
       headers: [
         {
           text: "Beer Name",
           align: "left",
-          sortable: false,
+          sortable: true,
           value: "name"
         },
         { text: "Location", value: "location" },
@@ -46,7 +46,15 @@ export default {
     };
   },
   computed: {
-    ...mapState(["taplist"])
+    ...mapState(["taplist"]),
+    search: {
+      get() {
+        return this.$store.state.search;
+      },
+      set(search) {
+        this.$store.commit("SET_SEARCH", search);
+      }
+    }
   }
 };
 </script>

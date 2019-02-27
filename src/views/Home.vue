@@ -6,6 +6,7 @@
 
 <script>
 import Taplist from "@/components/Taplist.vue";
+
 export default {
   name: "home",
   components: { Taplist }
