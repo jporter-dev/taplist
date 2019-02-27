@@ -2,6 +2,7 @@
 
 const yaml = require("js-yaml");
 const puppeteer = require("puppeteer");
+const isWsl = require("is-wsl");
 const path = require("path");
 const fs = require("fs");
 
@@ -34,7 +35,13 @@ function main() {
 }
 
 async function parseSite(site) {
-  let browser = await puppeteer.launch();
+  let opts = isWsl
+    ? {
+        executablePath: "/usr/bin/chromium-browser",
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      }
+    : {};
+  let browser = await puppeteer.launch(opts);
   let page = await browser.newPage();
   await page.goto(site.url);
   await page.waitForSelector(site.selector);
