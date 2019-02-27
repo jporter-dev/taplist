@@ -2,6 +2,13 @@ type Beer {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
-  name: String!
-  location: String!
+  name: String! @unique
+  locations: [Location!]! @relation(name: "BeerList")
+}
+
+type Location {
+  id: ID! @unique
+  name: String! @unique
+  url: String
+  beers: [Beer!]! @relation(name: "BeerList")
 }

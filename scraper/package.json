@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "js-yaml": "^3.12.1",
     "puppeteer": "^1.12.2"
   }
