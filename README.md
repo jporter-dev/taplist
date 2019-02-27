@@ -1,4 +1,4 @@
-# client
+# taplist
 
 ## Project setup
 ```
