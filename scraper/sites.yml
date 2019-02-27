@@ -3,10 +3,11 @@ sites:
   - name: Wet City
     url: http://wetcitybrewing.com/
     selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
+    namefilter: !!js/function 'function(word){let x = word.split(" by "); let z = x.splice(x.length-1, 1); x.unshift(z[0]); return x.join(" ")}'
   - name: Max's Taphouse
     url: http://maxs.com/
     selector: '#sidebar .content ul > li'
-  - name: Brass Tap
+  - name: The Brass Tap
     url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
     selector: '.beer .beerlisting span'
   - name: The Wine Source
@@ -15,6 +16,7 @@ sites:
   - name: Waverly Brewing Co
     url: http://waverlybrewingcompany.com/on-tap/
     selector: '.beer > .beer-details > p.beer-name > a'
+    namefilter: !!js/function 'function(word){ return `Waverly Brewing ${word}` }'
   - name: Frisco's Taphouse - Columbia
     url: http://www.friscogrille.com/cmobile-alt.php
     selector: '.name'
