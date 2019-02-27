@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "scrape": "node scraper/scraper.js",
-    "deploy": "./deploy.sh"
+    "deploy": "npm run scrape && npm run build"
   },
   "dependencies": {
     "axios": "^0.18.0",
