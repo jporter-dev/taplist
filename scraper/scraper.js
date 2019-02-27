@@ -23,7 +23,7 @@ function main() {
               resolve();
             })
             .catch(e => {
-              console.log(site.name, e);
+              console.log(`${site.name}\n`, e);
               process.exit(1);
             });
         });
