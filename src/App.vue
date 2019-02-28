@@ -13,7 +13,12 @@
         <v-toolbar-side-icon
           @click.stop="drawer = !drawer"
         ></v-toolbar-side-icon>
-        <span class="hidden-sm-and-down ml-4">Baltimore Beer Finder</span>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-title>
+        <v-toolbar-side-icon>
+          <img src="@/assets/logo-color-64x64.png" alt="Beer" height="32" />
+        </v-toolbar-side-icon>
       </v-toolbar-title>
     </v-toolbar>
     <v-content>
@@ -23,7 +28,10 @@
     </v-content>
     <v-footer app>
       <v-flex text-xs-center xs12>
-        <strong>Taplist updated daily.</strong> Last update: {{ last_updated }}.
+        <strong>Taplist updated daily.</strong>
+        <span class="hidden-sm-and-down">
+          Last update: {{ last_updated }}.</span
+        >
       </v-flex>
     </v-footer>
   </v-app>
