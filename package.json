@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2",
     "is-wsl": "^1.1.0",
     "js-yaml": "^3.12.2",
     "puppeteer": "^1.12.2",

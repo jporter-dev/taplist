@@ -31,10 +31,10 @@ sites:
     url: http://waverlybrewingcompany.com/on-tap/
     selector: '.beer > .beer-details > p.beer-name > a'
     namefilter: !!js/function 'function(word){ return `Waverly Brewing ${word}` }'
-  - name: Frisco's Taphouse - Columbia
+  - name: Frisco Taphouse Columbia
     url: http://www.friscogrille.com/cmobile-alt.php
     selector: '.name'
-  - name: Frisco's Taphouse - Crofton
+  - name: Frisco Taphouse Crofton
     url: http://www.friscogrille.com/wcmobile-alt.php
     selector: '.name'
   - name: Growler USA
