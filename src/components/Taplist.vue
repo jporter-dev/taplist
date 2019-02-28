@@ -35,7 +35,15 @@
           </a>
         </td>
         <td>{{ props.item.location }}</td>
-        <td>{{ true }}</td>
+        <td>
+          <v-avatar
+            :size="30"
+            color="grey lighten-4"
+            v-if="Math.random() > 0.5"
+          >
+            <img :src="users['-josh'].avatar" alt="avatar" />
+          </v-avatar>
+        </td>
       </template>
     </v-data-table>
   </v-card>
@@ -47,6 +55,12 @@ export default {
   name: "TapList",
   data() {
     return {
+      users: {
+        "-josh": {
+          avatar:
+            "https://untappd.akamaized.net/profile/d22a4c0d119e3d2014bd2ed0e13a7156_100x100.jpg"
+        }
+      },
       headers: [
         {
           text: "Beer Name",
