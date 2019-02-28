@@ -62,6 +62,7 @@ function getUntapped(beers) {
       promises.push(
         new Promise((resolve, reject) => {
           let delay = 1000 * (idx1 * idx1) + idx2 * 1000;
+          console.log(beer.name, user.name, delay);
           setTimeout(
             () =>
               axios
