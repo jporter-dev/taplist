@@ -3,7 +3,7 @@
     <v-subheader>Nearby Venues</v-subheader>
     <v-divider></v-divider>
     <template v-for="(total, venue) in venues">
-      <v-list-tile :key="venue + 'tile'" @click="SET_SEARCH(venue)">
+      <v-list-tile :key="venue + 'tile'" @click="click(venue)">
         <v-list-tile-content>
           {{ venue }}
         </v-list-tile-content>
@@ -33,7 +33,11 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SET_SEARCH"])
+    ...mapMutations(["SET_SEARCH", "SET_DRAWER"]),
+    click(venue) {
+      this.SET_SEARCH(venue);
+      this.SET_DRAWER(false);
+    }
   }
 };
 </script>

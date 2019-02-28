@@ -1,8 +1,10 @@
 <template>
   <v-card>
     <v-card-title>
-      Nearby Beers
-      <v-spacer></v-spacer>
+      <h3 class="hidden-sm-and-down">
+        Local Taplist
+      </h3>
+      <v-spacer class="hidden-sm-and-down"></v-spacer>
       <v-text-field
         v-model="search"
         append-icon="search"
