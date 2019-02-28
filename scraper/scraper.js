@@ -31,7 +31,7 @@ function main() {
       Promise.all(promises).then(() =>
         fs.writeFileSync(
           path.resolve(__dirname, "../public/taplist.json"),
-          JSON.stringify(db)
+          JSON.stringify({ taplist: db, last_updated: Date.now() })
         )
       );
     })();

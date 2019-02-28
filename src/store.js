@@ -3,11 +3,15 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
+const data = require("../public/taplist.json");
+console.log(data);
+
 export default new Vuex.Store({
   state: {
     drawer: null,
     search: null,
-    taplist: require("../public/taplist.json")
+    taplist: data.taplist,
+    last_updated: new Date(data.last_updated).toLocaleString()
   },
   mutations: {
     SET_DRAWER(state, payload) {

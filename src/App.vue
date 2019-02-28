@@ -21,15 +21,20 @@
         <router-view></router-view>
       </v-container>
     </v-content>
-    <v-footer app></v-footer>
+    <v-footer app>
+      <v-flex text-xs-center xs12>
+        <strong>Taplist updated daily.</strong> Last update: {{ last_updated }}.
+      </v-flex>
+    </v-footer>
   </v-app>
 </template>
 <script>
 import Venues from "@/components/Venues.vue";
-
+import { mapState } from "vuex";
 export default {
   components: { Venues },
   computed: {
+    ...mapState(["last_updated"]),
     drawer: {
       get() {
         return this.$store.state.drawer;
