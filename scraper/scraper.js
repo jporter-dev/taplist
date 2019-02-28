@@ -98,35 +98,63 @@ async function fetchUntappd(user) {
   console.log("Fetching untappd beers at " + url);
   let browser = await puppeteer.launch(opts);
   let page = await browser.newPage();
+  let cookie = [];
+  page.setCookie(...cookie);
+  page.setExtraHTTPHeaders({
+    authority: "untappd.com",
+    pragma: "no-cache",
+    "cache-control": "no-cache",
+    "upgrade-insecure-requests": "1",
+    accept:
+      "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "accept-encoding": "gzip, deflate, br",
+    "accept-language": "accept-language: en-US,en;q=0.9"
+  });
+  await page.tracing.start({ path: "./trace.json" });
+
+  // go to users page
   await page.goto(url);
-  console.log("Navigating...");
-  let buttonSelector = ".more-list-items";
-  console.log(`Waiting for selector [${buttonSelector}]...`);
-  await page.waitForSelector(buttonSelector);
-  loadMore(page, buttonSelector);
+  let buttonSelector = "[data-href*=morebeers]";
+  await page.waitForFunction(
+    `document.querySelector('${buttonSelector}') && document.querySelector('${buttonSelector}').style.display != 'none'`
+  );
+  let x = await page.evaluate(() => document.querySelector(".more-list-items"));
+  console.log(x);
+
+  // load beer list
+  let doneLoading = false;
+  while (!doneLoading) {
+    console.log("loading stuff");
+    try {
+      await page.click(buttonSelector);
+      console.log("click!");
+      await page.waitFor(5000);
+      await page.tracing.stop();
+      let bodyHTML = await page.evaluate(() => document.body.innerHTML);
+      console.log(bodyHTML);
+
+      // await page.waitForFunction(`document.querySelector('${buttonSelector}') && document.querySelector('${buttonSelector}').style.display != 'block'`)
+      // console.log('display none')
+      // await page.waitForFunction(`document.querySelector('${buttonSelector}') && document.querySelector('${buttonSelector}').style.display != 'none'`)
+      // console.log('display block')
+    } catch (error) {
+      console.log(error);
+      console.log("End of list.");
+      doneLoading = true;
+    }
+  }
 
   let beers = await page.evaluate(() => {
     return Array.from(document.querySelectorAll(".beer-item")).map(
       item =>
-        `${item.querySelector("brewery").innerText.trim()} ${item
-          .querySelector(".name")
-          .innerText.trim()}`
+        `${item
+          .querySelector(".brewery")
+          .innerText.trim()} ${item.querySelector(".name").innerText.trim()}`
     );
   });
-  await browser.close();
+  // await browser.close();
 
   console.log(beers);
-}
-
-async function loadMore(page, buttonSelector) {
-  console.log("clicking load more...");
-  await page.click(buttonSelector);
-  try {
-    await page.waitForSelector(buttonSelector);
-  } catch (error) {
-    console.log("End of list.");
-    return;
-  }
 }
 
 getUniques();
