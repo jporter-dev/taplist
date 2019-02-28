@@ -23,12 +23,19 @@ export default {
   computed: {
     ...mapState(["taplist"]),
     venues() {
-      return this.taplist
+      let venues = this.taplist
         .map(item => item.location)
         .reduce((acc, name) => {
           acc[name] = acc[name] ? acc[name] + 1 : 1;
           return acc;
         }, {});
+      const ordered_venues = {};
+      Object.keys(venues)
+        .sort()
+        .forEach(function(key) {
+          ordered_venues[key] = venues[key];
+        });
+      return ordered_venues;
     }
   },
   methods: {

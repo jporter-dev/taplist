@@ -21,7 +21,19 @@
       :rows-per-page-items="[25, 50, 100]"
     >
       <template slot="items" slot-scope="props">
-        <td>{{ props.item.name }}</td>
+        <td>
+          <a
+            :href="
+              `https://untappd.com/search?q=${encodeURIComponent(
+                props.item.name
+              )}`
+            "
+            target="_BLANK"
+            class="white--text"
+          >
+            {{ props.item.name }}
+          </a>
+        </td>
         <td>{{ props.item.location }}</td>
         <td>{{ true }}</td>
       </template>
