@@ -7,6 +7,7 @@
       fixed
     >
       <venues></venues>
+      <leaderboard></leaderboard>
     </v-navigation-drawer>
     <v-toolbar app fixed :clipped-left="$vuetify.breakpoint.lgAndUp">
       <v-toolbar-title>
@@ -36,9 +37,10 @@
 </template>
 <script>
 import Venues from "@/components/Venues.vue";
+import Leaderboard from "@/components/Leaderboard.vue";
 import { mapState } from "vuex";
 export default {
-  components: { Venues },
+  components: { Venues, Leaderboard },
   computed: {
     ...mapState(["last_updated"]),
     drawer: {

@@ -11,6 +11,7 @@ export default new Vuex.Store({
     search: null,
     taplist: data.taplist,
     users: data.users,
+    leaderboard: data.uniqueCounts,
     last_updated: new Date(data.last_updated).toLocaleString()
   },
   mutations: {

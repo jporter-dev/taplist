@@ -7,6 +7,7 @@ const yaml = require("js-yaml");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
+const getUniques = require("./uniques.js");
 
 dotenv.config();
 
@@ -63,8 +64,24 @@ function getCheckins(q) {
       facets: ["username"]
     })
     .then(content => {
-      if (content.facets.username) return Object.keys(content.facets.username);
+      if (content.facets.username)
+        return Object.keys(content.facets.username).sort((a, b) =>
+          a.toLowerCase().localeCompare(b.toLowerCase())
+        );
       else return [];
+    });
+}
+
+function getUniqueCounts() {
+  return beerIndex
+    .search({
+      query: "",
+      attributesToRetrieve: ["recentCheckin"],
+      hitsPerPage: 1,
+      facets: ["username"]
+    })
+    .then(content => {
+      return content.facets.username;
     });
 }
 
@@ -81,29 +98,34 @@ function main() {
     let db = [];
     void (async () => {
       let promises = CONFIG.sites.map(site => {
-        return new Promise(resolve => {
-          parseSite(site)
-            .then(beers => {
-              console.log(beers);
-              db = db.concat(beers);
-              resolve();
-            })
-            .catch(e => {
-              console.log(`${site.name}\n`, e);
-              process.exit(1);
-            });
-        });
-      });
-      Promise.all(promises).then(() =>
-        fs.writeFileSync(
-          path.resolve(__dirname, "../public/taplist.json"),
-          JSON.stringify({
-            taplist: db,
-            last_updated: Date.now(),
-            users: arrayToObject(CONFIG.users, "username")
+        return parseSite(site)
+          .then(beers => {
+            db = db.concat(beers);
           })
-        )
-      );
+          .catch(e => {
+            console.log(`${site.name}\n`, e);
+            process.exit(1);
+          });
+      });
+      Promise.all(promises).then(() => {
+        getUniqueCounts().then(counts => {
+          fs.writeFileSync(
+            path.resolve(__dirname, "../public/taplist.json"),
+            JSON.stringify({
+              taplist: db,
+              last_updated: Date.now(),
+              users: arrayToObject(CONFIG.users, "username"),
+              uniqueCounts: counts
+            })
+          );
+        });
+
+        // run unique updater twice per day
+        var today = new Date().getHours();
+        if ((today >= 4 && today < 5) || (today >= 16 && today < 17)) {
+          getUniques();
+        }
+      });
     })();
   } catch (e) {
     console.log(e);

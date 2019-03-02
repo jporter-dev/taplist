@@ -36,30 +36,12 @@
         </td>
         <td>{{ props.item.location }}</td>
         <td>
-          <v-tooltip
-            top
+          <user-avatar
             v-for="username in props.item.checkins"
             :key="username"
+            :user="users[username]"
           >
-            <template v-slot:activator="{ on }">
-              <v-avatar
-                v-if="users[username].hasOwnProperty('avatar')"
-                v-on="on"
-                :size="30"
-                color="grey lighten-4"
-                class="mx-1"
-              >
-                <img :src="users[username].avatar" alt="avatar" />
-              </v-avatar>
-              <v-avatar v-else v-on="on" :size="30" color="grey lighten-4">
-                <img
-                  src="https://gravatar.com/avatar/4cf0b707ad044bd2dd45bef6a8c6816c?size=125&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v3_gravatar.jpg%3Fv%3D2"
-                  alt="avatar"
-                />
-              </v-avatar>
-            </template>
-            <span>{{ username }}</span>
-          </v-tooltip>
+          </user-avatar>
         </td>
       </template>
     </v-data-table>
@@ -67,9 +49,12 @@
 </template>
 
 <script>
+import UserAvatar from "@/components/UserAvatar.vue";
 import { mapState } from "vuex";
+
 export default {
   name: "TapList",
+  components: { UserAvatar },
   data() {
     return {
       headers: [

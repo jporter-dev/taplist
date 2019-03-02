@@ -42,7 +42,6 @@ export default {
     ...mapMutations(["SET_SEARCH", "SET_DRAWER"]),
     click(venue) {
       this.SET_SEARCH(venue);
-      console.log(this.$vuetify.breakpoint.smAndDown);
       if (this.$vuetify.breakpoint.smAndDown) this.SET_DRAWER(false);
     }
   }

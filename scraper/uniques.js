@@ -32,8 +32,8 @@ function getUniques(all) {
 }
 
 function exportBeers(beers) {
-  beerIndex.addObjects(beers, function(err, content) {
-    console.log(content.taskID);
+  beerIndex.addObjects(beers, function(err) {
+    if (err) throw err;
   });
 }
 
@@ -81,7 +81,9 @@ async function loadUser(user, page) {
   console.log("Fetching untappd beers at " + url);
 
   let lastBeerDate = await lastBeer(user.username);
-  console.log(lastBeerDate.toString());
+  console.log(
+    `Last known checkin for ${user.username}: ${lastBeerDate.toString()}`
+  );
 
   // go to users page
   await page.goto(url);
@@ -93,7 +95,6 @@ async function loadUser(user, page) {
   // load beer list
   let doneLoading = false;
   while (!doneLoading) {
-    console.log(`Loading more distinct beers for ${user.username}...`);
     try {
       // check page to see if it contains any beers older than last beer in Algolia
       doneLoading = await page.evaluate(lastBeerDate => {
@@ -110,6 +111,7 @@ async function loadUser(user, page) {
         return dates;
       }, lastBeerDate);
 
+      console.log(`Loading more distinct beers for ${user.username}...`);
       // click "Load More"
       await page.click(buttonSelector);
       await page.waitFor(2000);
@@ -150,6 +152,10 @@ async function loadUser(user, page) {
       };
     });
   }, user.username);
+
+  beers = await beers.filter(beer => {
+    return new Date(beer.recentCheckin * 1000) >= new Date(lastBeerDate);
+  });
   return new Promise(resolve => resolve(beers));
 }
 
@@ -169,4 +175,4 @@ function lastBeer(username) {
   });
 }
 
-export default getUniques;
+module.exports = getUniques;
