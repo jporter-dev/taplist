@@ -2,16 +2,29 @@
 users:
   - name: Josh
     username: -josh
+    avatar: https://untappd.akamaized.net/profile/d22a4c0d119e3d2014bd2ed0e13a7156_100x100.jpg
   - name: Neil
     username: Neil
+    avatar: https://untappd.akamaized.net/profile/3edd68becae83c799016750f79f54b0f_100x100.jpg
   - name: Brendan
     username: BrendanGannon
-  - name: Mary
-    username: MaryJBalt
+    avatar: https://untappd.akamaized.net/profile/ca6d003c0b10a1de24a780bda3a6f43a_100x100.jpg
   - name: Alyssa
     username: onceuponalyssa
+    avatar: https://untappd.akamaized.net/profile/3c9bb179160e3641e512eba8afdec746_100x100.jpeg
+  - name: Blake
+    username: Jblakebeer
+  - name: Pammie
+    username: pammie629
+    avatar: https://untappd.akamaized.net/profile/3fc6a76588b062f0ee2e0bcb1368bc55_100x100.jpg
   - name: Tyler
     username: TylerKephart
+    avatar: https://untappd.akamaized.net/profile/6dfa3719dbfb9553f0fb49dd5e653498_100x100.jpg
+  - name: Mary
+    username: MaryJBalt
+    avatar: https://untappd.akamaized.net/profile/03258c1ef6664b65d4e52df32d4a068c_100x100.jpg
+  - name: Brandon
+    username: brewskibroh
 
 sites:
   - name: Wet City

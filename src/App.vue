@@ -28,10 +28,8 @@
     </v-content>
     <v-footer app>
       <v-flex text-xs-center xs12>
-        <strong>Taplist updated daily.</strong>
-        <span class="hidden-sm-and-down">
-          Last update: {{ last_updated }}.</span
-        >
+        <strong class="hidden-sm-and-down">Taplist updated daily.</strong>
+        <span> Last updated: {{ last_updated }}.</span>
       </v-flex>
     </v-footer>
   </v-app>
