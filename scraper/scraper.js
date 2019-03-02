@@ -28,6 +28,7 @@ function main() {
         return new Promise(resolve => {
           parseSite(site)
             .then(beers => {
+              console.log(beers);
               db = db.concat(beers);
               resolve();
             })
@@ -70,44 +71,34 @@ async function parseSite(site) {
   }, site.selector);
   await browser.close();
 
-  beers = await beers.map(async beer => {
+  beers = await beers.map(beer => {
     beer = beer.replace(/\s+/g, " ");
     // process with namefilter if exists
     if (site.hasOwnProperty("namefilter")) {
       beer = site.namefilter(beer);
     }
-    let uniques = await getUniques(beer);
-    return {
-      name: beer,
-      location: site.name,
-      uniques: uniques
-    };
+    return getCheckins(beer).then(checkins => {
+      return {
+        name: beer,
+        location: site.name,
+        checkins: checkins
+      };
+    });
   });
-  return new Promise(resolve => {
-    console.log(site.name);
-    resolve(beers);
-  });
+  return Promise.all(beers);
 }
 
-function getUniques(q) {
-  return new Promise(resolve => {
-    beerIndex.search(
-      {
-        query: q,
-        attributesToRetrieve: ["recentCheckin"],
-        hitsPerPage: 1,
-        facets: ["username"]
-      },
-      (err, content) => {
-        if (err) throw err;
-
-        if (content.facets.username) {
-          resolve(Object.keys(content.facets.username));
-        } else {
-          resolve([]);
-        }
-      }
-    );
-  });
+function getCheckins(q) {
+  return beerIndex
+    .search({
+      query: q,
+      attributesToRetrieve: ["recentCheckin"],
+      hitsPerPage: 1,
+      facets: ["username"]
+    })
+    .then(content => {
+      if (content.facets.username) return Object.keys(content.facets.username);
+      else return [];
+    });
 }
 main();
