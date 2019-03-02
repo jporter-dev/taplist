@@ -169,4 +169,4 @@ function lastBeer(username) {
   });
 }
 
-getUniques();
+export default getUniques;

@@ -19,40 +19,6 @@ const CONFIG = yaml.load(
   fs.readFileSync(path.resolve(__dirname, "config.yml"), "utf8")
 );
 
-function main() {
-  // Get document, or throw exception on error
-  try {
-    let db = [];
-    void (async () => {
-      let promises = CONFIG.sites.map(site => {
-        return new Promise(resolve => {
-          parseSite(site)
-            .then(beers => {
-              console.log(beers);
-              db = db.concat(beers);
-              resolve();
-            })
-            .catch(e => {
-              console.log(`${site.name}\n`, e);
-              process.exit(1);
-            });
-        });
-      });
-      Promise.all(promises).then(() =>
-        fs.writeFileSync(
-          path.resolve(__dirname, "../public/taplist.json"),
-          JSON.stringify({
-            taplist: db,
-            last_updated: Date.now()
-          })
-        )
-      );
-    })();
-  } catch (e) {
-    console.log(e);
-  }
-}
-
 async function parseSite(site) {
   let opts = isWsl
     ? {
@@ -101,4 +67,47 @@ function getCheckins(q) {
       else return [];
     });
 }
+
+function arrayToObject(array, keyField) {
+  return array.reduce((obj, item) => {
+    obj[item[keyField]] = item;
+    return obj;
+  }, {});
+}
+
+function main() {
+  // Get document, or throw exception on error
+  try {
+    let db = [];
+    void (async () => {
+      let promises = CONFIG.sites.map(site => {
+        return new Promise(resolve => {
+          parseSite(site)
+            .then(beers => {
+              console.log(beers);
+              db = db.concat(beers);
+              resolve();
+            })
+            .catch(e => {
+              console.log(`${site.name}\n`, e);
+              process.exit(1);
+            });
+        });
+      });
+      Promise.all(promises).then(() =>
+        fs.writeFileSync(
+          path.resolve(__dirname, "../public/taplist.json"),
+          JSON.stringify({
+            taplist: db,
+            last_updated: Date.now(),
+            users: arrayToObject(CONFIG.users, "username")
+          })
+        )
+      );
+    })();
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 main();

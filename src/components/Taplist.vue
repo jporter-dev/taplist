@@ -36,13 +36,30 @@
         </td>
         <td>{{ props.item.location }}</td>
         <td>
-          <v-avatar
-            :size="30"
-            color="grey lighten-4"
-            v-if="Math.random() > 0.5"
+          <v-tooltip
+            top
+            v-for="username in props.item.checkins"
+            :key="username"
           >
-            <img :src="users['-josh'].avatar" alt="avatar" />
-          </v-avatar>
+            <template v-slot:activator="{ on }">
+              <v-avatar
+                v-if="users[username].hasOwnProperty('avatar')"
+                v-on="on"
+                :size="30"
+                color="grey lighten-4"
+                class="mx-1"
+              >
+                <img :src="users[username].avatar" alt="avatar" />
+              </v-avatar>
+              <v-avatar v-else v-on="on" :size="30" color="grey lighten-4">
+                <img
+                  src="https://gravatar.com/avatar/4cf0b707ad044bd2dd45bef6a8c6816c?size=125&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v3_gravatar.jpg%3Fv%3D2"
+                  alt="avatar"
+                />
+              </v-avatar>
+            </template>
+            <span>{{ username }}</span>
+          </v-tooltip>
         </td>
       </template>
     </v-data-table>
@@ -55,12 +72,6 @@ export default {
   name: "TapList",
   data() {
     return {
-      users: {
-        "-josh": {
-          avatar:
-            "https://untappd.akamaized.net/profile/d22a4c0d119e3d2014bd2ed0e13a7156_100x100.jpg"
-        }
-      },
       headers: [
         {
           text: "Beer Name",
@@ -69,12 +80,12 @@ export default {
           value: "name"
         },
         { text: "Location", value: "location" },
-        { text: "Unique", value: "unique" }
+        { text: "Checkins", value: "checkins.length" }
       ]
     };
   },
   computed: {
-    ...mapState(["taplist"]),
+    ...mapState(["taplist", "users"]),
     search: {
       get() {
         return this.$store.state.search;
