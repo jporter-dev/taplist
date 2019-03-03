@@ -110,7 +110,7 @@ function main() {
       Promise.all(promises).then(() => {
         getUniqueCounts().then(counts => {
           fs.writeFileSync(
-            path.resolve(__dirname, "../public/taplist.json"),
+            path.resolve(__dirname, "../src/assets/taplist.json"),
             JSON.stringify({
               taplist: db,
               last_updated: Date.now(),

@@ -21,3 +21,4 @@ yarn-error.log*
 *.sw*
 
 cookies.json
+src/assets/taplist.json

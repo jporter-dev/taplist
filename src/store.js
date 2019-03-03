@@ -3,7 +3,7 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-const data = require("../public/taplist.json");
+const data = require("@/assets/taplist.json");
 
 export default new Vuex.Store({
   state: {
