@@ -31,11 +31,19 @@ async function parseSite(site) {
   let page = await browser.newPage();
   await page.goto(site.url);
   await page.waitForSelector(site.selector);
-  let beers = await page.evaluate(selector => {
-    return Array.from(document.querySelectorAll(selector)).map(beer =>
-      beer.innerText.trim()
-    );
-  }, site.selector);
+  let beers = await page.evaluate(site => {
+    return Array.from(document.querySelectorAll(site.selector)).map(beer => {
+      if (site.beerSelector && site.brewerySelector) {
+        return `${beer
+          .querySelector(site.brewerySelector)
+          .innerText.trim()} ${beer
+          .querySelector(site.beerSelector)
+          .innerText.trim()}`;
+      } else {
+        return beer.innerText.trim();
+      }
+    });
+  }, site);
   await browser.close();
 
   beers = await beers.map(beer => {

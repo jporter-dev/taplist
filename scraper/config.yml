@@ -57,3 +57,28 @@ sites:
     url: https://www.unioncraftbrewing.com/
     selector: '#projects .project .inside a > span.title'
     namefilter: !!js/function 'function(word){ return `Union ${word}` }'
+  - name: Pratt Street Ale House
+    url: https://untappd.com/v/pratt-street-ale-house/3424
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+  - name: Five and Dime Ale House
+    url: https://untappd.com/v/five-and-dime-ale-house/5490279
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+  - name: The Ale House Columbia
+    url: https://untappd.com/v/the-ale-house-columbia/498845
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+  - name: Bo Brooks Lighthouse Liquors
+    url: https://untappd.com/v/bo-brooks-lighthouse-liquors/115560
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+  - name: Whitey's Liquors
+    url: https://untappd.com/v/whiteys-liqours/987185
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
