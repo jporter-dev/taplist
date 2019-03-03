@@ -54,6 +54,10 @@ async function parseSite(site) {
     }
     return getCheckins(beer).then(checkins => {
       return {
+        id: `${beer.replace(/[^A-Z0-9]/gi, "_")}-${site.name.replace(
+          /[^A-Z0-9]/gi,
+          "_"
+        )}`,
         name: beer,
         location: site.name,
         checkins: checkins

@@ -7,7 +7,8 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "scrape": "node scraper/scraper.js",
-    "deploy": "npm run scrape && npm run build"
+    "deploy": "npm run scrape && npm run build",
+    "proxy": "lcp --proxyUrl https://untappd.com"
   },
   "dependencies": {
     "algoliasearch": "^3.32.0",
