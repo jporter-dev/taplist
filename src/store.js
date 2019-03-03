@@ -8,6 +8,7 @@ const data = require("@/assets/taplist.json");
 export default new Vuex.Store({
   state: {
     drawer: null,
+    rightDrawer: null,
     search: null,
     taplist: data.taplist,
     users: data.users,
@@ -17,6 +18,9 @@ export default new Vuex.Store({
   mutations: {
     SET_DRAWER(state, payload) {
       state.drawer = payload;
+    },
+    SET_RIGHT_DRAWER(state, payload) {
+      state.rightDrawer = payload;
     },
     SET_SEARCH(state, payload) {
       state.search = payload;

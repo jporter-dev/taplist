@@ -7,9 +7,22 @@
       fixed
     >
       <venues></venues>
+    </v-navigation-drawer>
+    <v-navigation-drawer
+      app
+      v-model="rightDrawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      fixed
+      right
+    >
       <leaderboard></leaderboard>
     </v-navigation-drawer>
-    <v-toolbar app fixed :clipped-left="$vuetify.breakpoint.lgAndUp">
+    <v-toolbar
+      app
+      fixed
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      :clipped-right="$vuetify.breakpoint.lgAndUp"
+    >
       <v-toolbar-title>
         <v-toolbar-side-icon
           @click.stop="drawer = !drawer"
@@ -19,6 +32,12 @@
       <v-toolbar-title>
         <v-toolbar-side-icon>
           <img src="@/assets/logo-color-64x64.png" alt="Beer" height="32" />
+        </v-toolbar-side-icon>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-title>
+        <v-toolbar-side-icon @click.stop="rightDrawer = !rightDrawer">
+          <v-icon>people</v-icon>
         </v-toolbar-side-icon>
       </v-toolbar-title>
     </v-toolbar>
@@ -49,6 +68,14 @@ export default {
       },
       set(val) {
         this.$store.commit("SET_DRAWER", val);
+      }
+    },
+    rightDrawer: {
+      get() {
+        return this.$store.state.rightDrawer;
+      },
+      set(val) {
+        this.$store.commit("SET_RIGHT_DRAWER", val);
       }
     }
   }

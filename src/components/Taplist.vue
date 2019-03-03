@@ -36,13 +36,7 @@
             {{ props.item.name }}
           </td>
           <td>
-            <v-progress-circular
-              v-if="props.item.loading"
-              indeterminate
-              color="amber"
-            ></v-progress-circular>
             <user-avatar
-              v-else
               transition="fade-transition"
               v-for="username in props.item.checkins"
               :key="username"
@@ -54,33 +48,45 @@
       </template>
       <template v-slot:expand="props">
         <v-card flat color="grey darken-1">
-          <v-card-title>
-            <user-avatar
-              transition="fade-transition"
-              v-for="username in props.item.checkins"
-              :key="username"
-              :user="users[username]"
-            >
-            </user-avatar>
-          </v-card-title>
           <v-card-text>
-            <v-layout row wrap>
-              <v-flex xs6>
+            <v-layout row justify-center>
+              <v-flex xs12 md6 my-2>
+                <h3 class="mb-2">Who's had it</h3>
+                <user-avatar
+                  transition="fade-transition"
+                  v-for="username in props.item.checkins"
+                  :key="username"
+                  :user="users[username]"
+                >
+                </user-avatar>
+              </v-flex>
+            </v-layout>
+            <v-layout row wrap justify-center>
+              <v-flex xs6 md3>
                 <h3>Location</h3>
                 <p>{{ props.item.location }}</p>
               </v-flex>
-              <v-flex xs6>
-                <h3>Rating</h3>
-                <v-rating
-                  v-model="props.item.rating"
-                  color="yellow darken-3"
-                  small
-                  readonly
-                  half-increments
-                ></v-rating>
+              <v-flex xs6 md3>
+                <v-layout wrap>
+                  <v-flex shrink mr-5>
+                    <h3>Rating</h3>
+                    <span>{{ props.item.rating }}</span>
+                  </v-flex>
+                  <v-flex grow>
+                    <v-rating
+                      v-model="props.item.rating"
+                      color="yellow darken-3"
+                      small
+                      readonly
+                      half-increments
+                    ></v-rating>
+                  </v-flex>
+                </v-layout>
               </v-flex>
-              <v-flex xs6></v-flex>
-              <v-flex xs6>
+            </v-layout>
+            <v-layout row wrap justify-center>
+              <v-flex xs6 md3></v-flex>
+              <v-flex xs6 md3>
                 <v-btn
                   :href="
                     `https://untappd.com/search?q='${encodeURIComponent(
@@ -136,7 +142,6 @@ export default {
   },
   methods: {
     clicked(props) {
-      props.item.loading = true;
       let url =
         process.env.NODE_ENV === "development"
           ? `http://localhost:8010/proxy/search?q=${props.item.name}`
@@ -160,7 +165,6 @@ export default {
             props.item.rating = 0;
           }
           props.expanded = !props.expanded;
-          props.item.loading = false;
         });
     }
   }
@@ -175,10 +179,13 @@ tr.beer-row {
 tr.beer-row td.hidden {
   display: none;
 }
-tr.beer-row:not(.expanded) div.v-avatar {
-  margin-left: -26px !important;
-}
 th.hidden-header {
   display: none;
+}
+tr.beer-row.expanded div.v-avatar {
+  display: none;
+}
+tr.beer-row:not(.expanded) div.v-avatar {
+  margin-left: -26px !important;
 }
 </style>
