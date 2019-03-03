@@ -30,6 +30,9 @@ async function parseSite(site) {
   let browser = await puppeteer.launch(opts);
   let page = await browser.newPage();
   await page.goto(site.url);
+
+  if (site.name == "Perfect Pour") await page.reload();
+
   await page.waitForSelector(site.selector);
   let beers = await page.evaluate(site => {
     return Array.from(document.querySelectorAll(site.selector)).map(beer => {
@@ -45,6 +48,9 @@ async function parseSite(site) {
     });
   }, site);
   await browser.close();
+
+  // unique the beers
+  beers = [...new Set(beers)];
 
   beers = await beers.map(beer => {
     beer = beer.replace(/\s+/g, " ");

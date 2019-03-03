@@ -82,3 +82,10 @@ sites:
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
+  # - name: Perfect Pour
+  #   url: https://theperfectpour.com/GrowlerBoard.asp
+  #   selector: 'tr.GrowlerBeerName'
+  - name: Nepenthe Brewing Co
+    url: https://www.nepenthebrewingco.com/on-tap
+    selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
+    namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Co ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
