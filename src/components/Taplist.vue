@@ -80,6 +80,9 @@
                       readonly
                       half-increments
                     ></v-rating>
+                    <span class="red--text text--lighten-3">
+                      {{ props.item.error }}
+                    </span>
                   </v-flex>
                 </v-layout>
               </v-flex>
@@ -142,30 +145,40 @@ export default {
   },
   methods: {
     clicked(props) {
+      let storage = window.localStorage;
+      let rating = storage.getItem(props.item.name);
+      if (rating) props.item.rating = parseFloat(rating);
+
       let url =
         process.env.NODE_ENV === "development"
           ? `http://localhost:8010/proxy/search?q=${props.item.name}`
           : `/untappd/search?q=${props.item.name}`;
-      fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          // Initialize the DOM parser
-          var parser = new DOMParser();
-          // Parse the text
-          var doc = parser.parseFromString(html, "text/html");
-          try {
-            props.item.rating = parseFloat(
-              doc
-                .querySelector(
-                  ".beer-item > .beer.details > p.rating > span.num"
-                )
-                .innerText.replace(/[()]/g, "")
-            );
-          } catch (error) {
-            props.item.rating = 0;
-          }
-          props.expanded = !props.expanded;
-        });
+      if (!props.item.rating) {
+        fetch(url)
+          .then(response => response.text())
+          .then(html => {
+            // Initialize the DOM parser
+            var parser = new DOMParser();
+            // Parse the text
+            var doc = parser.parseFromString(html, "text/html");
+            try {
+              props.item.rating = parseFloat(
+                doc
+                  .querySelector(
+                    ".beer-item > .beer.details > p.rating > span.num"
+                  )
+                  .innerText.replace(/[()]/g, "")
+              );
+              storage.setItem(props.item.name, props.item.rating);
+            } catch (error) {
+              props.item.error = "Untappd rating not found.";
+              props.item.rating = 0;
+            }
+            props.expanded = !props.expanded;
+          });
+      } else {
+        props.expanded = !props.expanded;
+      }
     }
   }
 };
