@@ -52,24 +52,28 @@ async function parseSite(site) {
   // unique the beers
   beers = [...new Set(beers)];
 
-  beers = await beers.map(beer => {
-    beer = beer.replace(/\s+/g, " ");
-    // process with namefilter if exists
-    if (site.hasOwnProperty("namefilter")) {
-      beer = site.namefilter(beer);
-    }
-    return getCheckins(beer).then(checkins => {
-      return {
-        id: `${beer.replace(/[^A-Z0-9]/gi, "_")}-${site.name.replace(
-          /[^A-Z0-9]/gi,
-          "_"
-        )}`,
-        name: beer,
-        location: site.name,
-        checkins: checkins
-      };
-    });
-  });
+  beers = await beers
+    .map(beer => {
+      beer = beer.replace(/\s+/g, " ");
+      // process with namefilter if exists
+      if (site.hasOwnProperty("namefilter")) {
+        beer = site.namefilter(beer);
+      }
+      if (beer) {
+        return getCheckins(beer).then(checkins => {
+          return {
+            id: `${beer.replace(/[^A-Z0-9]/gi, "_")}-${site.name.replace(
+              /[^A-Z0-9]/gi,
+              "_"
+            )}`,
+            name: beer,
+            location: site.name,
+            checkins: checkins
+          };
+        });
+      }
+    })
+    .filter(beer => beer);
   return Promise.all(beers);
 }
 

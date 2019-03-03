@@ -63,8 +63,8 @@
             </v-layout>
             <v-layout row wrap justify-center>
               <v-flex xs6 md3>
-                <h3>Location</h3>
-                <p>{{ props.item.location }}</p>
+                <h3>Style</h3>
+                <p>{{ props.item.style }}</p>
               </v-flex>
               <v-flex xs6 md3>
                 <v-layout wrap>
@@ -88,7 +88,10 @@
               </v-flex>
             </v-layout>
             <v-layout row wrap justify-center>
-              <v-flex xs6 md3></v-flex>
+              <v-flex xs6 md3>
+                <h3>Location</h3>
+                <p>{{ props.item.location }}</p></v-flex
+              >
               <v-flex xs6 md3>
                 <v-btn
                   :href="
@@ -147,13 +150,15 @@ export default {
     clicked(props) {
       let storage = window.localStorage;
       let rating = storage.getItem(props.item.name);
-      if (rating) props.item.rating = parseFloat(rating);
+      if (rating) this.$set(props.item, "rating", parseFloat(rating));
+      let style = storage.getItem(`${props.item.name}.style`);
+      if (rating) this.$set(props.item, "style", style);
 
       let url =
         process.env.NODE_ENV === "development"
           ? `http://localhost:8010/proxy/search?q=${props.item.name}`
           : `/untappd/search?q=${props.item.name}`;
-      if (!props.item.rating) {
+      if ((!props.item.rating || !props.item.style) && !props.item.error) {
         fetch(url)
           .then(response => response.text())
           .then(html => {
@@ -162,14 +167,21 @@ export default {
             // Parse the text
             var doc = parser.parseFromString(html, "text/html");
             try {
-              props.item.rating = parseFloat(
+              let rating = parseFloat(
                 doc
                   .querySelector(
                     ".beer-item > .beer.details > p.rating > span.num"
                   )
                   .innerText.replace(/[()]/g, "")
               );
+              let style = doc
+                .querySelector(".beer-item > .beer-details > p.style")
+                .innerText.trim();
+              this.$set(props.item, "rating", rating);
+              this.$set(props.item, "style", style);
+
               storage.setItem(props.item.name, props.item.rating);
+              storage.setItem(`${props.item.name}.style`, props.item.style);
             } catch (error) {
               props.item.error = "Untappd rating not found.";
               props.item.rating = 0;

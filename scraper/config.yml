@@ -27,65 +27,74 @@ users:
     username: brewskibroh
 
 sites:
-  - name: Wet City
-    url: http://wetcitybrewing.com/
-    selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
-    namefilter: !!js/function 'function(word){let x = word.split(" by "); let z = x.splice(x.length-1, 1); x.unshift(z[0]); return x.join(" ")}'
-  - name: Max's Taphouse
-    url: http://maxs.com/
-    selector: '#sidebar .content ul > li'
-  - name: The Brass Tap
-    url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
-    selector: '.beer .beerlisting span'
-  - name: The Wine Source
-    url: https://www.beermenus.com/places/14642-the-wine-source
-    selector: '#on_tap li.pure-list-item h3 > a'
-  - name: Waverly Brewing Co
-    url: http://waverlybrewingcompany.com/on-tap/
-    selector: '.beer > .beer-details > p.beer-name > a'
-    namefilter: !!js/function 'function(word){ return `Waverly Brewing ${word}` }'
-  - name: Frisco's Taphouse - Columbia
-    url: http://www.friscogrille.com/cmobile-alt.php
-    selector: '.name'
-  - name: Frisco's Taphouse - Crofton
-    url: http://www.friscogrille.com/wcmobile-alt.php
-    selector: '.name'
-  - name: Growler USA
-    url: https://growlerusa.com/craft-beer-pubs/baltimore-rotunda/whats-on-tap/
-    selector: '#taphunter-taps div.taphunter-row span.beer-name > a.productlink span'
-  - name: Union Craft Brewing
-    url: https://www.unioncraftbrewing.com/
-    selector: '#projects .project .inside a > span.title'
-    namefilter: !!js/function 'function(word){ return `Union ${word}` }'
-  - name: Pratt Street Ale House
-    url: https://untappd.com/v/pratt-street-ale-house/3424
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-  - name: Five and Dime Ale House
-    url: https://untappd.com/v/five-and-dime-ale-house/5490279
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-  - name: The Ale House Columbia
-    url: https://untappd.com/v/the-ale-house-columbia/498845
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
+  # - name: Wet City
+  #   url: http://wetcitybrewing.com/
+  #   selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
+  #   namefilter: !!js/function 'function(word){let x = word.split(" by "); let z = x.splice(x.length-1, 1); x.unshift(z[0]); return x.join(" ")}'
+  # - name: Max's Taphouse
+  #   url: http://maxs.com/
+  #   selector: '#sidebar .content ul > li'
+  # - name: The Brass Tap
+  #   url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
+  #   selector: '.beer .beerlisting span'
+  # - name: The Wine Source
+  #   url: https://www.beermenus.com/places/14642-the-wine-source
+  #   selector: '#on_tap li.pure-list-item h3 > a'
+  # - name: Waverly Brewing Co
+  #   url: http://waverlybrewingcompany.com/on-tap/
+  #   selector: '.beer > .beer-details > p.beer-name > a'
+  #   namefilter: !!js/function 'function(word){ return `Waverly Brewing ${word}` }'
+  # - name: Frisco's Taphouse - Columbia
+  #   url: http://www.friscogrille.com/cmobile-alt.php
+  #   selector: '.name'
+  # - name: Frisco's Taphouse - Crofton
+  #   url: http://www.friscogrille.com/wcmobile-alt.php
+  #   selector: '.name'
+  # - name: Growler USA
+  #   url: https://growlerusa.com/craft-beer-pubs/baltimore-rotunda/whats-on-tap/
+  #   selector: '#taphunter-taps div.taphunter-row span.beer-name > a.productlink span'
+  # - name: Union Craft Brewing
+  #   url: https://www.unioncraftbrewing.com/
+  #   selector: '#projects .project .inside a > span.title'
+  #   namefilter: !!js/function 'function(word){ return `Union ${word}` }'
+  # - name: Pratt Street Ale House
+  #   url: https://untappd.com/v/pratt-street-ale-house/3424
+  #   selector: '.beer-info'
+  #   beerSelector: 'h5 a'
+  #   brewerySelector: 'h6 a'
+  # - name: Five and Dime Ale House
+  #   url: https://untappd.com/v/five-and-dime-ale-house/5490279
+  #   selector: '.beer-info'
+  #   beerSelector: 'h5 a'
+  #   brewerySelector: 'h6 a'
+  # - name: The Ale House Columbia
+  #   url: https://untappd.com/v/the-ale-house-columbia/498845
+  #   selector: '.beer-info'
+  #   beerSelector: 'h5 a'
+  #   brewerySelector: 'h6 a'
   - name: Bo Brooks Lighthouse Liquors
     url: https://untappd.com/v/bo-brooks-lighthouse-liquors/115560
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
-  - name: Whitey's Liquors
-    url: https://untappd.com/v/whiteys-liqours/987185
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-  # - name: Perfect Pour
-  #   url: https://theperfectpour.com/GrowlerBoard.asp
-  #   selector: 'tr.GrowlerBeerName'
-  - name: Nepenthe Brewing Co
-    url: https://www.nepenthebrewingco.com/on-tap
-    selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
-    namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Co ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
+    namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
+  # - name: Whitey's Liquors
+  #   url: https://untappd.com/v/whiteys-liqours/987185
+  #   selector: '.beer-info'
+  #   beerSelector: 'h5 a'
+  #   brewerySelector: 'h6 a'
+  # # - name: Perfect Pour
+  # #   url: https://theperfectpour.com/GrowlerBoard.asp
+  # #   selector: 'tr.GrowlerBeerName'
+  # - name: Nepenthe Brewing Co
+  #   url: https://www.nepenthebrewingco.com/on-tap
+  #   selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
+  #   namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Company ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
+  # - name: Sapwood Cellars
+  #   url: https://sapwoodcellars.com/what-do-we-have/
+  #   selector: '.et_pb_section > .et_pb_row > .et_pb_column > .et_pb_module > .et_pb_text_inner > p > span'
+  #   namefilter: !!js/function 'function(word){ word = word.split(":"); if (word && word.length >= 2) return `Sapwood Cellars ${word[0].replace(/[\-\:\–\*].*/g, "").trim()}` }'
+  # - name: Black Flag Brewing Co
+  #   url: https://www.blackflagbrewingco.com
+  #   selector: '.taplist > tbody > tr > td:first-child'
+  #   namefilter: !!js/function 'function(word){ return `Black Flag Brewing Company ${word}` }'
