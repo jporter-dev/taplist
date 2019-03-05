@@ -144,9 +144,9 @@ function main() {
 
         // run unique updater twice per day
         var today = new Date().getHours();
-        if ((today >= 4 && today < 5) || (today >= 16 && today < 17)) {
+        //if ((today >= 4 && today < 5) || (today >= 16 && today < 17)) {
           getUniques();
-        }
+        //}
       });
     })();
   } catch (e) {
