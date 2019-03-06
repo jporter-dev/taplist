@@ -89,7 +89,7 @@ sites:
   - name: Nepenthe Brewing Co
     url: https://www.nepenthebrewingco.com/on-tap
     selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
-    namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Company ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
+    namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Co ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
   - name: Sapwood Cellars
     url: https://sapwoodcellars.com/what-do-we-have/
     selector: '.et_pb_section > .et_pb_row > .et_pb_column > .et_pb_module > .et_pb_text_inner > p > span'
