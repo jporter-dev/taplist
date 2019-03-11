@@ -2,7 +2,11 @@
   <v-list>
     <v-subheader>Checkin Leaderboard</v-subheader>
     <template v-for="(count, name) in leaderboard">
-      <v-list-tile :key="name + 'tile'">
+      <v-list-tile
+        :key="name + 'tile'"
+        target="_BLANK"
+        :href="`https://untappd.com/user/${name}`"
+      >
         <v-list-tile-avatar>
           <user-avatar :user="users[name]"></user-avatar>
         </v-list-tile-avatar>

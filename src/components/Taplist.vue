@@ -32,11 +32,15 @@
             <v-icon v-if="!props.expanded">expand_more</v-icon>
             <v-icon v-else>expand_less</v-icon>
           </td>
+          <td>{{ props.item.name }}</td>
           <td>
-            {{ props.item.name }}
-          </td>
-          <td>
+            <v-progress-circular
+              v-if="props.item.loading"
+              indeterminate
+              color="amber"
+            ></v-progress-circular>
             <user-avatar
+              v-else
               transition="fade-transition"
               v-for="username in props.item.checkins"
               :key="username"
@@ -159,6 +163,7 @@ export default {
           ? `http://localhost:8010/proxy/search?q=${props.item.name}`
           : `/untappd/search?q=${props.item.name}`;
       if ((!props.item.rating || !props.item.style) && !props.item.error) {
+        this.$set(props.item, "loading", true);
         fetch(url)
           .then(response => response.text())
           .then(html => {
@@ -179,12 +184,13 @@ export default {
                 .innerText.trim();
               this.$set(props.item, "rating", rating);
               this.$set(props.item, "style", style);
-
               storage.setItem(props.item.name, props.item.rating);
               storage.setItem(`${props.item.name}.style`, props.item.style);
             } catch (error) {
               props.item.error = "Untappd rating not found.";
               props.item.rating = 0;
+            } finally {
+              this.$set(props.item, "loading", false);
             }
             props.expanded = !props.expanded;
           });
