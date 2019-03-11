@@ -1,7 +1,12 @@
 <template>
   <v-tooltip top>
     <template v-slot:activator="{ on }">
-      <v-avatar v-on="on" :size="30" color="grey lighten-4" class="mx-1">
+      <v-avatar
+        v-on="on"
+        :size="34"
+        color="grey lighten-4"
+        class="mx-1 untappd-avatar"
+      >
         <img
           v-if="user.hasOwnProperty('avatar')"
           :src="user.avatar"
@@ -24,3 +29,8 @@ export default {
   props: ["user"]
 };
 </script>
+<style>
+.untappd-avatar img {
+  border: 1px solid #eee;
+}
+</style>
