@@ -83,9 +83,10 @@ sites:
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
-  # - name: Perfect Pour
-  #   url: https://theperfectpour.com/GrowlerBoard.asp
-  #   selector: 'tr.GrowlerBeerName'
+  - name: Perfect Pour
+    url: https://untappd.com/v/the-perfect-pour/134414
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
   - name: Nepenthe Brewing Co
     url: https://www.nepenthebrewingco.com/on-tap
     selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
