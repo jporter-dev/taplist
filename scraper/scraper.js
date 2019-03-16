@@ -6,8 +6,8 @@ const yaml = require("js-yaml");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
-const getUniques = require("./uniques.js");
-const indices = require("./algolia");
+// const getUniques = require("./uniques.js");
+// const indices = require("./algolia");
 
 dotenv.config();
 
