@@ -43,6 +43,9 @@
     </v-toolbar>
     <v-content>
       <v-container fluid>
+        <v-alert :value="true" type="warning">
+          Checkin data currently disabled.
+        </v-alert>
         <router-view></router-view>
       </v-container>
     </v-content>

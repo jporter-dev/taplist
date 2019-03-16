@@ -85,8 +85,10 @@ sites:
     brewerySelector: 'h6 a'
   - name: Perfect Pour
     url: https://untappd.com/v/the-perfect-pour/134414
-    selector: '.beer-info'
+    selector: '.menu-area .menu-section:first-child .beer-info'
     beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
   - name: Nepenthe Brewing Co
     url: https://www.nepenthebrewingco.com/on-tap
     selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'

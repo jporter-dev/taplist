@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const algoliasearch = require("algoliasearch");
 const puppeteer = require("puppeteer");
 const isWsl = require("is-wsl");
 const yaml = require("js-yaml");
@@ -8,14 +7,10 @@ const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
 const getUniques = require("./uniques.js");
+const indices = require("./algolia");
 
 dotenv.config();
 
-const algoClient = algoliasearch(
-  process.env.ALGO_APPID,
-  process.env.ALGO_APIKEY
-);
-const beerIndex = algoClient.initIndex("unique_beers");
 const CONFIG = yaml.load(
   fs.readFileSync(path.resolve(__dirname, "config.yml"), "utf8")
 );
@@ -60,17 +55,17 @@ async function parseSite(site) {
         beer = site.namefilter(beer);
       }
       if (beer) {
-        return getCheckins(beer).then(checkins => {
-          return {
-            id: `${beer.replace(/[^A-Z0-9]/gi, "_")}-${site.name.replace(
-              /[^A-Z0-9]/gi,
-              "_"
-            )}`,
-            name: beer,
-            location: site.name,
-            checkins: checkins
-          };
-        });
+        // return getCheckins(beer).then(checkins => {
+        return {
+          id: `${beer.replace(/[^A-Z0-9]/gi, "_")}-${site.name.replace(
+            /[^A-Z0-9]/gi,
+            "_"
+          )}`,
+          name: beer,
+          location: site.name,
+          checkins: []
+        };
+        // });
       }
     })
     .filter(beer => beer);
@@ -78,33 +73,41 @@ async function parseSite(site) {
 }
 
 function getCheckins(q) {
-  return beerIndex
-    .search({
-      query: q,
-      attributesToRetrieve: ["recentCheckin"],
-      hitsPerPage: 1,
-      facets: ["username"]
+  return Promise.all(
+    Object.values(indices).map(i => {
+      return i.beer
+        .search({
+          query: q,
+          attributesToRetrieve: ["recentCheckin"],
+          hitsPerPage: 1,
+          facets: ["username"]
+        })
+        .then(content => {
+          if (content.facets.username)
+            return Object.keys(content.facets.username).sort((a, b) =>
+              a.toLowerCase().localeCompare(b.toLowerCase())
+            );
+          else return [];
+        });
     })
-    .then(content => {
-      if (content.facets.username)
-        return Object.keys(content.facets.username).sort((a, b) =>
-          a.toLowerCase().localeCompare(b.toLowerCase())
-        );
-      else return [];
-    });
+  );
 }
 
 function getUniqueCounts() {
-  return beerIndex
-    .search({
-      query: "",
-      attributesToRetrieve: ["recentCheckin"],
-      hitsPerPage: 1,
-      facets: ["username"]
+  return Promise.all(
+    Object.values(indices).map(i => {
+      return i.beer
+        .search({
+          query: "",
+          attributesToRetrieve: ["recentCheckin"],
+          hitsPerPage: 1,
+          facets: ["username"]
+        })
+        .then(content => {
+          return content.facets.username;
+        });
     })
-    .then(content => {
-      return content.facets.username;
-    });
+  );
 }
 
 function arrayToObject(array, keyField) {
@@ -130,23 +133,20 @@ function main() {
           });
       });
       Promise.all(promises).then(() => {
-        getUniqueCounts().then(counts => {
-          fs.writeFileSync(
-            path.resolve(__dirname, "../src/assets/taplist.json"),
-            JSON.stringify({
-              taplist: db,
-              last_updated: Date.now(),
-              users: arrayToObject(CONFIG.users, "username"),
-              uniqueCounts: counts
-            })
-          );
-        });
-
-        // run unique updater twice per day
-        var today = new Date().getHours();
-        //if ((today >= 4 && today < 5) || (today >= 16 && today < 17)) {
-          getUniques();
-        //}
+        // getUniqueCounts().then(counts => {
+        fs.writeFileSync(
+          path.resolve(__dirname, "../src/assets/taplist.json"),
+          JSON.stringify({
+            taplist: db,
+            last_updated: Date.now(),
+            users: arrayToObject(CONFIG.users, "username"),
+            uniqueCounts: {}
+          })
+        );
+        // });
+        // TODO fix this - need new source for storing uniques
+        // algolia free tier too limiting...
+        // getUniques();
       });
     })();
   } catch (e) {

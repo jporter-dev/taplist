@@ -1,21 +1,12 @@
 #!/usr/bin/env node
 
-const algoliasearch = require("algoliasearch");
 const puppeteer = require("puppeteer");
 const isWsl = require("is-wsl");
 const yaml = require("js-yaml");
 const path = require("path");
 const fs = require("fs");
-const dotenv = require("dotenv");
+const indices = require("./algolia");
 
-dotenv.config();
-
-const algoClient = algoliasearch(
-  process.env.ALGO_APPID,
-  process.env.ALGO_APIKEY
-);
-const beerIndex = algoClient.initIndex("unique_beers");
-const userIndex = algoClient.initIndex("unique_beer_users");
 const CONFIG = yaml.load(
   fs.readFileSync(path.resolve(__dirname, "config.yml"), "utf8")
 );
@@ -25,14 +16,15 @@ function getUniques(all) {
   if (!all) {
     CONFIG.users.forEach(async user => {
       fetchUntappd(user).then(beers => {
-        exportBeers(beers);
+        exportBeers(beers, user);
       });
     });
   }
 }
 
-function exportBeers(beers) {
-  beerIndex.addObjects(beers, function(err) {
+function exportBeers(beers, user) {
+  let index = user.index || 0;
+  indices[index].beer.addObjects(beers, function(err) {
     if (err) throw err;
   });
 }
@@ -80,7 +72,7 @@ async function loadUser(user, page) {
   let url = `https://untappd.com/user/${user.username}/beers`;
   console.log("Fetching untappd beers at " + url);
 
-  let lastBeerDate = await lastBeer(user.username);
+  let lastBeerDate = await lastBeer(user);
   console.log(
     `Last known checkin for ${user.username}: ${lastBeerDate.toString()}`
   );
@@ -98,18 +90,17 @@ async function loadUser(user, page) {
     try {
       // check page to see if it contains any beers older than last beer in Algolia
       doneLoading = await page.evaluate(lastBeerDate => {
-        let dateReached = false;
         let dates = Array.from(
           document.querySelectorAll(
             ".beer-item .date a[data-href*=recentCheckin]"
           )
         ).map(item => {
           let date = new Date(item.innerText.trim());
-          if (date < new Date(lastBeerDate)) dateReached = true;
-          return dateReached;
+          return date < new Date(lastBeerDate);
         });
         return dates;
       }, lastBeerDate);
+      doneLoading = doneLoading.filter(x => x).length > 0;
 
       console.log(`Loading more distinct beers for ${user.username}...`);
       // click "Load More"
@@ -159,17 +150,24 @@ async function loadUser(user, page) {
   return new Promise(resolve => resolve(beers));
 }
 
-function lastBeer(username) {
+function lastBeer(user) {
+  let index = user.index || 0;
+  console.log(index);
   return new Promise(resolve => {
-    userIndex.search(
+    indices[index].beer.search(
       {
-        query: username,
+        query: user.username,
         attributesToRetrieve: ["recentCheckin"],
         hitsPerPage: 1
       },
       (err, content) => {
         if (err) throw err;
-        resolve(new Date(content.hits[0].recentCheckin * 1000));
+        console.log(content.hits);
+        if (content.hits[0])
+          resolve(new Date(content.hits[0].recentCheckin * 1000));
+        else {
+          resolve(new Date(0));
+        }
       }
     );
   });
