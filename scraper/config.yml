@@ -103,4 +103,4 @@ sites:
     namefilter: !!js/function 'function(word){ return `Black Flag Brewing Company ${word}` }'
   - name: Victoria Gastro Pub
     url: https://victoriagastropub.com/draught-list/
-    selector: '.fdm-item-has-price'
+    selector: '.fdm-item-has-price .fdm-item-title'
