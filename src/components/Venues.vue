@@ -1,5 +1,5 @@
 <template>
-  <v-list>
+  <v-list v-if="!loading">
     <v-subheader>Nearby Venues</v-subheader>
     <template v-for="(total, venue) in venues">
       <v-list-tile :key="venue + 'tile'" @click="click(venue)">
@@ -21,7 +21,7 @@ import { mapState, mapMutations } from "vuex";
 export default {
   name: "Venues",
   computed: {
-    ...mapState(["taplist"]),
+    ...mapState(["taplist", "loading"]),
     venues() {
       let venues = this.taplist
         .map(item => item.location)

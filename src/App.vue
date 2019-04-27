@@ -15,7 +15,7 @@
       fixed
       right
     >
-      <leaderboard></leaderboard>
+      <settings></settings>
     </v-navigation-drawer>
     <v-toolbar
       app
@@ -37,7 +37,7 @@
       <v-spacer></v-spacer>
       <v-toolbar-title>
         <v-toolbar-side-icon @click.stop="rightDrawer = !rightDrawer">
-          <v-icon>people</v-icon>
+          <v-icon>settings</v-icon>
         </v-toolbar-side-icon>
       </v-toolbar-title>
     </v-toolbar>
@@ -58,10 +58,10 @@
 </template>
 <script>
 import Venues from "@/components/Venues.vue";
-import Leaderboard from "@/components/Leaderboard.vue";
+import Settings from "@/components/Settings.vue";
 import { mapState } from "vuex";
 export default {
-  components: { Venues, Leaderboard },
+  components: { Venues, Settings },
   computed: {
     ...mapState(["last_updated"]),
     drawer: {

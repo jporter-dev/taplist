@@ -14,6 +14,7 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
+      v-if="!loading"
       :headers="headers"
       :items="taplist"
       :search="search"
@@ -140,7 +141,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["taplist", "users"]),
+    ...mapState(["taplist", "users", "loading"]),
     search: {
       get() {
         return this.$store.state.search;

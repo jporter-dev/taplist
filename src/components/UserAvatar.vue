@@ -8,7 +8,7 @@
         class="mx-1 untappd-avatar"
       >
         <img
-          v-if="user.hasOwnProperty('avatar')"
+          v-if="user && user.hasOwnProperty('avatar')"
           :src="user.avatar"
           alt="avatar"
         />
@@ -19,7 +19,7 @@
         />
       </v-avatar>
     </template>
-    <span>{{ user.username }}</span>
+    <span>{{ user ? user.username : "" }}</span>
   </v-tooltip>
 </template>
 
