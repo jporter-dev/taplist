@@ -47,9 +47,11 @@ sites:
   - name: Frisco's Taphouse - Columbia
     url: http://www.friscogrille.com/cmobile-alt.php
     selector: '.name'
+    namefilter: !!js/function 'function(word) { return word.replace(/\*/g ,"") }'
   - name: Frisco's Taphouse - Crofton
     url: http://www.friscogrille.com/wcmobile-alt.php
     selector: '.name'
+    namefilter: !!js/function 'function(word) { return word.replace(/\*/g ,"") }'
   - name: Growler USA
     url: https://growlerusa.com/craft-beer-pubs/baltimore-rotunda/whats-on-tap/
     selector: '#taphunter-taps div.taphunter-row span.beer-name > a.productlink span'

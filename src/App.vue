@@ -49,9 +49,9 @@
         <router-view></router-view>
       </v-container>
     </v-content>
-    <v-footer app>
+    <v-footer app :color="needsUpdate ? 'red lighten-1' : null">
       <v-flex text-xs-center xs12>
-        <span> <b>Last update</b>: {{ last_updated }}</span>
+        <span> <b>Last update</b>: {{ last_updated }} </span>
       </v-flex>
     </v-footer>
   </v-app>
@@ -63,7 +63,13 @@ import { mapState } from "vuex";
 export default {
   components: { Venues, Settings },
   computed: {
-    ...mapState(["last_updated"]),
+    ...mapState(["last_updated", "last_updated_timestamp"]),
+    needsUpdate() {
+      if (!this.last_updated_timestamp) return false;
+      const delta =
+        (new Date() - new Date(this.last_updated_timestamp)) / 1000 / 60 / 60;
+      return delta > 36;
+    },
     drawer: {
       get() {
         return this.$store.state.drawer;

@@ -24,7 +24,8 @@ const store = new Vuex.Store({
     taplist: null,
     users: null,
     leaderboard: null,
-    last_updated: null
+    last_updated: null,
+    last_updated_timestamp: null
   },
   mutations: {
     SET_DATA(state, data) {
@@ -32,6 +33,7 @@ const store = new Vuex.Store({
       state.taplist = data.taplist;
       state.users = data.users;
       state.last_updated = new Date(data.last_updated).toLocaleString();
+      state.last_updated_timestamp = data.last_updated;
     },
     SET_DRAWER(state, payload) {
       state.drawer = payload;
