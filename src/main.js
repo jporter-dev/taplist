@@ -6,7 +6,7 @@ import Vuetify from "vuetify";
 import bugsnag from "@bugsnag/js";
 import bugsnagVue from "@bugsnag/plugin-vue";
 
-import "./registerServiceWorker";
+//import "./registerServiceWorker";
 import "vuetify/dist/vuetify.min.css"; // Ensure you are using css-loader
 
 const bugsnagClient = bugsnag(process.env.VUE_APP_BUGSNAG);
