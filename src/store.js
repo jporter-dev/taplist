@@ -47,7 +47,7 @@ const store = new Vuex.Store({
   },
   actions: {
     getData(store) {
-      fetch("/taplist.json")
+      fetch("/taplist.json", {cache: "no-store"})
         .then(response => response.json())
         .then(json => store.commit("SET_DATA", json));
     }
