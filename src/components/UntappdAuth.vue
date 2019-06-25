@@ -13,7 +13,7 @@
 export default {
   data() {
     return {
-      redirect_url: `http://${window.location.host}`,
+      redirect_url: `//${window.location.host}`,
       authorized: false,
       untappd_client_id: process.env.VUE_APP_UNTAPPD_ID,
       untappd_client_secret: process.env.VUE_APP_UNTAPPD_SECRET
