@@ -29,7 +29,10 @@ export default {
         }&response_type=code&redirect_url=${this.redirect_url}&code=${
           this.$route.query.code
         }`
-      ).then(resp => console.log(resp));
+      ).then(resp => {
+        console.log(resp)
+        return resp.json()
+      }).then(json => console.log(json));
     }
   }
 };
