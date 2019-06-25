@@ -4,6 +4,7 @@
       <v-subheader>Settings</v-subheader>
     </v-flex>
     <v-flex xs12>
+      <UntappdAuth></UntappdAuth>
       <v-text-field
         label="Untappd Username"
         solo
@@ -16,7 +17,10 @@
 </template>
 
 <script>
-export default {};
+import UntappdAuth from "@/components/UntappdAuth";
+export default {
+  components: { UntappdAuth }
+};
 </script>
 
 <style></style>
