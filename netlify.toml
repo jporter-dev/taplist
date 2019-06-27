@@ -3,3 +3,9 @@
   to = "https://untappd.com/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/untappd_api/*"
+  to = "https://api.untappd.com/:splat"
+  status = 200
+  force = true
