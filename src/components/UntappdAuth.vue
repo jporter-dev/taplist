@@ -56,7 +56,7 @@ export default {
         }`
       )
         .then(response => response.json())
-        .then(json => this.SET_UNTAPPD(json.access_token));
+        .then(json => this.SET_UNTAPPD(json.response.access_token));
     }
   }
 };
