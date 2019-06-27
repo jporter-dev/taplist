@@ -199,6 +199,16 @@ export default {
         props.expanded = !props.expanded;
       }
     }
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler() {
+        if (this.$route.params.name) {
+          this.search = this.$route.params.name;
+        }
+      }
+    }
   }
 };
 </script>
