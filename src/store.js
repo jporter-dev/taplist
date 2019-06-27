@@ -26,7 +26,7 @@ const store = new Vuex.Store({
     leaderboard: null,
     last_updated: null,
     last_updated_timestamp: null,
-    untappd: "27B831CD85CAFB37029D430E10E03663A0CD2CEE",
+    untappd: null,
     untappd_user: null
   },
   mutations: {
