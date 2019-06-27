@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/untappd/*"
+  to = "https://untappd.com/:splat"
+  status = 200
+  force = true

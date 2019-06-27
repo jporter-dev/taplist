@@ -22,7 +22,7 @@ export default {
   mounted() {
     if (!this.authorized && this.$route.query.code) {
       fetch(
-        `${this.redirect_url}/oauth/authorize/?client_id=${
+        `${this.redirect_url}/untappd/oauth/authorize/?client_id=${
           this.untappd_client_id
         }&client_secret=${
           this.untappd_client_secret
