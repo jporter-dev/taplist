@@ -141,7 +141,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["taplist", "users", "loading"]),
+    ...mapState(["taplist", "users", "loading", "untappd"]),
     search: {
       get() {
         return this.$store.state.search;
@@ -159,41 +159,41 @@ export default {
       let style = storage.getItem(`${props.item.name}.style`);
       if (rating) this.$set(props.item, "style", style);
 
-      let url =
-        process.env.NODE_ENV === "development"
-          ? `http://localhost:8010/proxy/search?q=${props.item.name}`
-          : `/untappd/search?q=${props.item.name}`;
+      let url = `https://api.untappd.com/v4/search/beer?q=${
+        props.item.name
+      }&access_token=${this.untappd}`;
+
       if ((!props.item.rating || !props.item.style) && !props.item.error) {
         this.$set(props.item, "loading", true);
         fetch(url)
-          .then(response => response.text())
-          .then(html => {
-            // Initialize the DOM parser
-            var parser = new DOMParser();
-            // Parse the text
-            var doc = parser.parseFromString(html, "text/html");
-            try {
-              let rating = parseFloat(
-                doc
-                  .querySelector(
-                    ".beer-item > .beer.details > p.rating > span.num"
-                  )
-                  .innerText.replace(/[()]/g, "")
-              );
-              let style = doc
-                .querySelector(".beer-item > .beer-details > p.style")
-                .innerText.trim();
-              this.$set(props.item, "rating", rating);
-              this.$set(props.item, "style", style);
-              storage.setItem(props.item.name, props.item.rating);
-              storage.setItem(`${props.item.name}.style`, props.item.style);
-            } catch (error) {
+          .then(response => response.json())
+          .then(json => {
+            if (json.response.beers.count > 0) {
+              const bid = json.response.beers.items[0].beer.bid;
+              fetch(
+                `https://api.untappd.com/v4/beer/info/${bid}?access_token=${
+                  this.untappd
+                }`
+              )
+                .then(resp => resp.json())
+                .then(json => {
+                  const beer = json.response.beer;
+                  const rating = parseFloat(beer.rating_score);
+                  const style = beer.beer_style;
+                  this.$set(props.item, "rating", rating);
+                  this.$set(props.item, "style", style);
+                  storage.setItem(props.item.name, props.item.rating);
+                  storage.setItem(`${props.item.name}.style`, props.item.style);
+
+                  this.$set(props.item, "loading", false);
+                  props.expanded = !props.expanded;
+                });
+            } else {
               props.item.error = "Untappd rating not found.";
               props.item.rating = 0;
-            } finally {
               this.$set(props.item, "loading", false);
+              props.expanded = !props.expanded;
             }
-            props.expanded = !props.expanded;
           });
       } else {
         props.expanded = !props.expanded;
@@ -206,6 +206,8 @@ export default {
       handler() {
         if (this.$route.params.name) {
           this.search = this.$route.params.name;
+        } else {
+          this.search = null;
         }
       }
     }

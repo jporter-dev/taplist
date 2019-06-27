@@ -30,7 +30,7 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-title>
-        <v-toolbar-side-icon>
+        <v-toolbar-side-icon to="/">
           <img src="@/assets/logo-color-64x64.png" alt="Beer" height="32" />
         </v-toolbar-side-icon>
       </v-toolbar-title>
