@@ -5,7 +5,12 @@
   force = true
 
 [[redirects]]
-  from = "/untappd_api/*"
-  to = "https://api.untappd.com/:splat"
+  from = "/untappd/*"
+  to = "https://untappd.com/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
