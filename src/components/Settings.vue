@@ -1,22 +1,18 @@
 <template>
   <v-layout row wrap>
     <v-flex xs12>
-      <v-subheader>Settings</v-subheader>
-    </v-flex>
-    <v-flex xs12>
-      <v-text-field
-        label="Untappd Username"
-        solo
-        light
-        flat
-        single-line
-      ></v-text-field>
+      <UntappdAuth></UntappdAuth>
+      <UntappdFeed></UntappdFeed>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
-export default {};
+import UntappdAuth from "@/components/UntappdAuth";
+import UntappdFeed from "@/components/UntappdFeed";
+export default {
+  components: { UntappdFeed, UntappdAuth }
+};
 </script>
 
 <style></style>

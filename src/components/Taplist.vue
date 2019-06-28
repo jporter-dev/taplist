@@ -53,33 +53,55 @@
       </template>
       <template v-slot:expand="props">
         <v-card flat color="grey darken-1">
-          <v-card-text>
+          <v-card-text v-if="props.item.beer">
             <v-layout row justify-center>
               <v-flex xs12 md6 my-2>
-                <h3 class="mb-2">Who's had it</h3>
-                <user-avatar
-                  transition="fade-transition"
-                  v-for="username in props.item.checkins"
-                  :key="username"
-                  :user="users[username]"
-                >
-                </user-avatar>
+                <h3 class="mb-2">Description</h3>
+                {{ props.item.beer.beer_description }}
               </v-flex>
             </v-layout>
             <v-layout row wrap justify-center>
               <v-flex xs6 md3>
-                <h3>Style</h3>
-                <p>{{ props.item.style }}</p>
+                <v-layout wrap>
+                  <v-flex shrink mr-5>
+                    <h3>
+                      Your Rating
+                      <span class="caption"
+                        >({{
+                          props.item.beer.stats.user_count === 0
+                            ? "N/A"
+                            : props.item.beer.auth_rating
+                        }})</span
+                      >
+                    </h3>
+                  </v-flex>
+                  <v-flex grow>
+                    <v-rating
+                      v-model="props.item.beer.auth_rating"
+                      color="yellow darken-3"
+                      small
+                      readonly
+                      half-increments
+                    ></v-rating>
+                    <span class="red--text text--lighten-3">
+                      {{ props.item.error }}
+                    </span>
+                  </v-flex>
+                </v-layout>
               </v-flex>
               <v-flex xs6 md3>
                 <v-layout wrap>
                   <v-flex shrink mr-5>
-                    <h3>Rating</h3>
-                    <span>{{ props.item.rating }}</span>
+                    <h3>
+                      Global Rating
+                      <span class="caption"
+                        >({{ props.item.beer.rating_score }})</span
+                      >
+                    </h3>
                   </v-flex>
                   <v-flex grow>
                     <v-rating
-                      v-model="props.item.rating"
+                      v-model="props.item.beer.rating_score"
                       color="yellow darken-3"
                       small
                       readonly
@@ -94,9 +116,15 @@
             </v-layout>
             <v-layout row wrap justify-center>
               <v-flex xs6 md3>
-                <h3>Location</h3>
-                <p>{{ props.item.location }}</p></v-flex
-              >
+                <v-flex xs12>
+                  <h3>Style</h3>
+                  <p>{{ props.item.beer.beer_style }}</p>
+                </v-flex>
+                <v-flex xs12>
+                  <h3>Location</h3>
+                  <p>{{ props.item.location }}</p>
+                </v-flex>
+              </v-flex>
               <v-flex xs6 md3>
                 <v-btn
                   :href="
@@ -111,6 +139,9 @@
               </v-flex>
             </v-layout>
           </v-card-text>
+          <v-alert :value="true" type="error" v-else>
+            You must be logged in to view Untappd data.
+          </v-alert>
         </v-card>
       </template>
     </v-data-table>
@@ -141,7 +172,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["taplist", "users", "loading"]),
+    ...mapState(["taplist", "users", "loading", "untappd"]),
     search: {
       get() {
         return this.$store.state.search;
@@ -154,49 +185,56 @@ export default {
   methods: {
     clicked(props) {
       let storage = window.localStorage;
-      let rating = storage.getItem(props.item.name);
-      if (rating) this.$set(props.item, "rating", parseFloat(rating));
-      let style = storage.getItem(`${props.item.name}.style`);
-      if (rating) this.$set(props.item, "style", style);
+      let beer = JSON.parse(storage.getItem(props.item.name));
+      if (beer) {
+        this.$set(props.item, "beer", beer);
+      }
 
-      let url =
-        process.env.NODE_ENV === "development"
-          ? `http://localhost:8010/proxy/search?q=${props.item.name}`
-          : `/untappd/search?q=${props.item.name}`;
-      if ((!props.item.rating || !props.item.style) && !props.item.error) {
+      let url = `https://api.untappd.com/v4/search/beer?q=${
+        props.item.name
+      }&access_token=${this.untappd}`;
+
+      if (this.untappd && !props.item.beer && !props.item.error) {
         this.$set(props.item, "loading", true);
         fetch(url)
-          .then(response => response.text())
-          .then(html => {
-            // Initialize the DOM parser
-            var parser = new DOMParser();
-            // Parse the text
-            var doc = parser.parseFromString(html, "text/html");
-            try {
-              let rating = parseFloat(
-                doc
-                  .querySelector(
-                    ".beer-item > .beer.details > p.rating > span.num"
-                  )
-                  .innerText.replace(/[()]/g, "")
-              );
-              let style = doc
-                .querySelector(".beer-item > .beer-details > p.style")
-                .innerText.trim();
-              this.$set(props.item, "rating", rating);
-              this.$set(props.item, "style", style);
-              storage.setItem(props.item.name, props.item.rating);
-              storage.setItem(`${props.item.name}.style`, props.item.style);
-            } catch (error) {
+          .then(response => response.json())
+          .then(json => {
+            if (json.response.beers.count > 0) {
+              const bid = json.response.beers.items[0].beer.bid;
+              fetch(
+                `https://api.untappd.com/v4/beer/info/${bid}?access_token=${
+                  this.untappd
+                }`
+              )
+                .then(resp => resp.json())
+                .then(json => {
+                  const beer = json.response.beer;
+                  this.$set(props.item, "beer", beer);
+                  storage.setItem(props.item.name, JSON.stringify(beer));
+                  this.$set(props.item, "loading", false);
+                  props.expanded = !props.expanded;
+                });
+            } else {
               props.item.error = "Untappd rating not found.";
-              props.item.rating = 0;
-            } finally {
+              props.item.beer.rating_score = 0;
               this.$set(props.item, "loading", false);
+              props.expanded = !props.expanded;
             }
-            props.expanded = !props.expanded;
           });
       } else {
         props.expanded = !props.expanded;
+      }
+    }
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler() {
+        if (this.$route.params.name) {
+          this.search = this.$route.params.name;
+        } else {
+          this.search = null;
+        }
       }
     }
   }

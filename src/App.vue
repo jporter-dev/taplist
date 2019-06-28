@@ -30,14 +30,17 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-title>
-        <v-toolbar-side-icon>
+        <v-toolbar-side-icon to="/">
           <img src="@/assets/logo-color-64x64.png" alt="Beer" height="32" />
         </v-toolbar-side-icon>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-title>
         <v-toolbar-side-icon @click.stop="rightDrawer = !rightDrawer">
-          <v-icon>settings</v-icon>
+          <v-avatar v-if="untappd_user" :size="34">
+            <img :src="untappd_user.user_avatar" alt="avatar" />
+          </v-avatar>
+          <v-icon v-else>person</v-icon>
         </v-toolbar-side-icon>
       </v-toolbar-title>
     </v-toolbar>
@@ -63,7 +66,7 @@ import { mapState } from "vuex";
 export default {
   components: { Venues, Settings },
   computed: {
-    ...mapState(["last_updated", "last_updated_timestamp"]),
+    ...mapState(["last_updated", "last_updated_timestamp", "untappd_user"]),
     needsUpdate() {
       if (!this.last_updated_timestamp) return false;
       const delta =

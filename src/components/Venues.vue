@@ -2,7 +2,7 @@
   <v-list v-if="!loading">
     <v-subheader>Nearby Venues</v-subheader>
     <template v-for="(total, venue) in venues">
-      <v-list-tile :key="venue + 'tile'" @click="click(venue)">
+      <v-list-tile :key="venue + 'tile'" :to="`/venue/${venue}`">
         <v-list-tile-content>
           {{ venue }}
         </v-list-tile-content>
@@ -39,11 +39,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SET_SEARCH", "SET_DRAWER"]),
-    click(venue) {
-      this.SET_SEARCH(venue);
-      if (this.$vuetify.breakpoint.smAndDown) this.SET_DRAWER(false);
-    }
+    ...mapMutations(["SET_SEARCH", "SET_DRAWER"])
   }
 };
 </script>
