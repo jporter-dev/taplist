@@ -53,7 +53,7 @@
       </template>
       <template v-slot:expand="props">
         <v-card flat color="grey darken-1">
-          <v-card-text>
+          <v-card-text v-if="props.item.beer">
             <v-layout row justify-center>
               <v-flex xs12 md6 my-2>
                 <h3 class="mb-2">Description</h3>
@@ -139,6 +139,9 @@
               </v-flex>
             </v-layout>
           </v-card-text>
+          <v-alert :value="true" type="error" v-else>
+            You must be logged in to view Untappd data.
+          </v-alert>
         </v-card>
       </template>
     </v-data-table>
@@ -191,7 +194,7 @@ export default {
         props.item.name
       }&access_token=${this.untappd}`;
 
-      if (!props.item.beer && !props.item.error) {
+      if (this.untappd && !props.item.beer && !props.item.error) {
         this.$set(props.item, "loading", true);
         fetch(url)
           .then(response => response.json())
