@@ -64,10 +64,7 @@ const store = new Vuex.Store({
         .then(json => store.commit("SET_DATA", json));
     },
     getUntappdUser(store) {
-      const base =
-        process.env.NODE_ENV === "development"
-          ? "https://api.untappd.com"
-          : "/untappd_api";
+      const base = "https://api.untappd.com";
       fetch(`${base}/v4/user/info?access_token=${store.state.untappd}`)
         .then(response => response.json())
         .then(json => store.commit("SET_UNTAPPD_USER", json.response.user));
