@@ -1,16 +1,16 @@
 [[redirects]]
-  from = "/untappd/*"
-  to = "https://untappd.com/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/untappd/*"
-  to = "https://untappd.com/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[redirects]]
+  from = "/untappd/*"
+  to = "https://untappd.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/untappd/*"
+  to = "https://untappd.com/:splat"
+  status = 200
+  force = true
