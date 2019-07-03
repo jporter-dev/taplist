@@ -13,7 +13,8 @@ const store = new Vuex.Store({
         setItem: (key, value) =>
           Cookies.set(key, value, { expires: 90, secure: true }),
         removeItem: key => Cookies.remove(key)
-      }
+      },
+      paths: ["untappd"]
     })
   ],
   state: {
