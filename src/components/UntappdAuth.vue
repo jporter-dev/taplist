@@ -46,6 +46,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this.untappd);
     if (!this.untappd && this.$route.query.code) {
       fetch(
         `${this.redirect_url}/untappd/oauth/authorize/?client_id=${
