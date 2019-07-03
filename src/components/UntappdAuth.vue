@@ -58,8 +58,7 @@ export default {
         .then(response => response.json())
         .then(json => {
           this.SET_UNTAPPD(json.response.access_token);
-          window.location.href =
-            window.location.origin + window.location.pathname;
+          this.$router.push({ ...this.$route, query: {} });
         });
     }
   }
