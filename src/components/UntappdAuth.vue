@@ -38,8 +38,8 @@ export default {
     untappd: {
       immediate: true,
       handler() {
+        console.log(this.untappd);
         if (this.untappd && !this.untappd_user) {
-          console.log(this.untappd, this.untappd_user);
           this.getUntappdUser();
         }
       }
