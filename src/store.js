@@ -26,7 +26,10 @@ const store = new Vuex.Store({
     leaderboard: null,
     last_updated: null,
     last_updated_timestamp: null,
-    untappd: null,
+    untappd: (() =>
+      process.env.NODE_ENV === "development"
+        ? process.env.VUE_APP_UNTAPPD_DEV
+        : null)(),
     untappd_user: null
   },
   mutations: {
@@ -59,7 +62,7 @@ const store = new Vuex.Store({
   },
   actions: {
     getData(store) {
-      fetch("/taplist.json", {cache: "no-store"})
+      fetch("/taplist.json", { cache: "no-store" })
         .then(response => response.json())
         .then(json => store.commit("SET_DATA", json));
     },

@@ -1,5 +1,5 @@
 <template>
-  <v-list two-line v-if="untappd_user">
+  <v-list three-line v-if="untappd_user">
     <v-subheader> {{ untappd_user.user_name }}'s Recent Check-ins</v-subheader>
     <template v-for="item in untappd_user.checkins.items">
       <v-list-tile
@@ -21,6 +21,15 @@
           <v-list-tile-sub-title
             v-text="item.brewery.brewery_name"
           ></v-list-tile-sub-title>
+          <v-rating
+            v-model="item.rating_score"
+            color="yellow darken-3"
+            dense
+            small
+            readonly
+            half-increments
+            :title="item.rating_score"
+          ></v-rating>
         </v-list-tile-content>
       </v-list-tile>
     </template>
