@@ -39,7 +39,7 @@ export default {
       immediate: true,
       handler() {
         if (this.untappd && !this.untappd_user) {
-          console.log(this.untappd_user);
+          console.log(this.untappd, this.untappd_user);
           this.getUntappdUser();
         }
       }
