@@ -38,7 +38,7 @@ export default {
     untappd: {
       immediate: true,
       handler() {
-        console.log(this.untappd);
+        console.log("watcher", this.untappd);
         if (this.untappd && !this.untappd_user) {
           this.getUntappdUser();
         }
@@ -46,7 +46,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.untappd);
+    console.log("mounted", this.untappd);
     if (!this.untappd && this.$route.query.code) {
       fetch(
         `${this.redirect_url}/untappd/oauth/authorize/?client_id=${
