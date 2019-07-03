@@ -38,7 +38,6 @@ export default {
     untappd: {
       immediate: true,
       handler() {
-        console.log("watcher", this.untappd);
         if (this.untappd && !this.untappd_user) {
           this.getUntappdUser();
         }
@@ -46,7 +45,6 @@ export default {
     }
   },
   mounted() {
-    console.log("mounted", this.untappd);
     if (!this.untappd && this.$route.query.code) {
       fetch(
         `${this.redirect_url}/untappd/oauth/authorize/?client_id=${
@@ -58,7 +56,11 @@ export default {
         }`
       )
         .then(response => response.json())
-        .then(json => this.SET_UNTAPPD(json.response.access_token));
+        .then(json => {
+          this.SET_UNTAPPD(json.response.access_token);
+          window.location.href =
+            window.location.origin + window.location.pathname;
+        });
     }
   }
 };
