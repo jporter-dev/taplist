@@ -18,15 +18,13 @@ const store = new Vuex.Store({
     })
   ],
   state: {
-    loading: true,
     drawer: null,
+    last_updated: null,
+    last_updated_timestamp: null,
+    loading: true,
     rightDrawer: null,
     search: null,
     taplist: null,
-    users: null,
-    leaderboard: null,
-    last_updated: null,
-    last_updated_timestamp: null,
     untappd: (() =>
       process.env.NODE_ENV === "development"
         ? process.env.VUE_APP_UNTAPPD_DEV
@@ -37,7 +35,6 @@ const store = new Vuex.Store({
     SET_DATA(state, data) {
       state.loading = false;
       state.taplist = data.taplist;
-      state.users = data.users;
       state.last_updated = new Date(data.last_updated).toLocaleString();
       state.last_updated_timestamp = data.last_updated;
     },

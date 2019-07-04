@@ -172,7 +172,8 @@ export default {
           sortable: true,
           value: "name"
         },
-        { text: "Rating", value: "rating" }
+        { text: "Rating", value: "rating" },
+        { text: "Location", value: "location", class: ["hidden-header"] }
       ]
     };
   },
