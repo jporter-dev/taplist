@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <taplist></taplist>
+    <taplist v-if="$store.state.taplist"></taplist>
   </div>
 </template>
 

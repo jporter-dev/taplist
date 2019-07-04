@@ -40,21 +40,28 @@
               indeterminate
               color="amber"
             ></v-progress-circular>
-            <user-avatar
-              v-else
-              transition="fade-transition"
-              v-for="username in props.item.checkins"
-              :key="username"
-              :user="users[username]"
-            >
-            </user-avatar>
+            <div v-else>
+              <template>
+                <v-rating
+                  v-model="props.item.rating"
+                  color="yellow darken-3"
+                  small
+                  dense
+                  readonly
+                  half-increments
+                ></v-rating>
+                <span class="grey--text text--lighten-2 caption ml-2">
+                  ({{ props.item.rating || "Click to load" }})
+                </span>
+              </template>
+            </div>
           </td>
         </tr>
       </template>
       <template v-slot:expand="props">
         <v-card flat color="grey darken-1">
-          <v-card-text v-if="props.item.beer">
-            <v-layout row justify-center>
+          <v-card-text v-if="untappd">
+            <v-layout row justify-center v-if="props.item.beer">
               <v-flex xs12 md6 my-2>
                 <h3 class="mb-2">Description</h3>
                 {{ props.item.beer.beer_description }}
@@ -66,7 +73,7 @@
                   <v-flex shrink mr-5>
                     <h3>
                       Your Rating
-                      <span class="caption"
+                      <span class="caption" v-if="props.item.beer"
                         >({{
                           props.item.beer.stats.user_count === 0
                             ? "N/A"
@@ -77,6 +84,7 @@
                   </v-flex>
                   <v-flex grow>
                     <v-rating
+                      v-if="props.item.beer"
                       v-model="props.item.beer.auth_rating"
                       color="yellow darken-3"
                       small
@@ -94,13 +102,14 @@
                   <v-flex shrink mr-5>
                     <h3>
                       Global Rating
-                      <span class="caption"
-                        >({{ props.item.beer.rating_score }})</span
-                      >
+                      <span class="caption" v-if="props.item.beer">
+                        ({{ props.item.beer.rating_score }})
+                      </span>
                     </h3>
                   </v-flex>
                   <v-flex grow>
                     <v-rating
+                      v-if="props.item.beer"
                       v-model="props.item.beer.rating_score"
                       color="yellow darken-3"
                       small
@@ -118,7 +127,7 @@
               <v-flex xs6 md3>
                 <v-flex xs12>
                   <h3>Style</h3>
-                  <p>{{ props.item.beer.beer_style }}</p>
+                  <p v-if="props.item.beer">{{ props.item.beer.beer_style }}</p>
                 </v-flex>
                 <v-flex xs12>
                   <h3>Location</h3>
@@ -149,12 +158,10 @@
 </template>
 
 <script>
-import UserAvatar from "@/components/UserAvatar.vue";
 import { mapState } from "vuex";
 
 export default {
   name: "TapList",
-  components: { UserAvatar },
   data() {
     return {
       headers: [
@@ -165,9 +172,7 @@ export default {
           sortable: true,
           value: "name"
         },
-        { text: "Checkins", value: "checkins.length" },
-        { text: "Location", value: "location", class: ["hidden-header"] },
-        { text: "Users", value: "checkins", class: ["hidden-header"] }
+        { text: "Rating", value: "rating" }
       ]
     };
   },
@@ -183,43 +188,71 @@ export default {
     }
   },
   methods: {
+    loadAllBeers() {
+      this.taplist.map((item, i) => {
+        if (item.location === this.$route.params.name) {
+          this.getBeer(item.name, false).then(beer => {
+            this.$set(this.taplist[i], "beer", beer);
+            this.$set(
+              this.taplist[i],
+              "rating",
+              beer && beer.rating_score ? beer.rating_score : null
+            );
+          });
+        }
+      });
+    },
+    getBeer(name, fetchBeer = true) {
+      return new Promise((resolve, reject) => {
+        let storage = window.localStorage;
+        let beer = JSON.parse(storage.getItem(name));
+        if (beer) {
+          resolve(beer);
+        } else {
+          let url = `https://api.untappd.com/v4/search/beer?q=${name}&access_token=${
+            this.untappd
+          }`;
+          if (fetchBeer) {
+            fetch(url)
+              .then(response => response.json())
+              .then(json => {
+                if (json.response.beers.count <= 0) {
+                  reject("Unable to find beer on Untappd.");
+                } else {
+                  const bid = json.response.beers.items[0].beer.bid;
+                  fetch(
+                    `https://api.untappd.com/v4/beer/info/${bid}?access_token=${
+                      this.untappd
+                    }`
+                  )
+                    .then(resp => resp.json())
+                    .then(json => {
+                      const beer = json.response.beer;
+                      storage.setItem(name, JSON.stringify(beer));
+                      resolve(beer);
+                    });
+                }
+              });
+          } else {
+            resolve(null);
+          }
+        }
+      });
+    },
     clicked(props) {
-      let storage = window.localStorage;
-      let beer = JSON.parse(storage.getItem(props.item.name));
-      if (beer) {
-        this.$set(props.item, "beer", beer);
-      }
-
-      let url = `https://api.untappd.com/v4/search/beer?q=${
-        props.item.name
-      }&access_token=${this.untappd}`;
-
-      if (this.untappd && !props.item.beer && !props.item.error) {
+      if (!props.expanded) {
         this.$set(props.item, "loading", true);
-        fetch(url)
-          .then(response => response.json())
-          .then(json => {
-            if (json.response.beers.count > 0) {
-              const bid = json.response.beers.items[0].beer.bid;
-              fetch(
-                `https://api.untappd.com/v4/beer/info/${bid}?access_token=${
-                  this.untappd
-                }`
-              )
-                .then(resp => resp.json())
-                .then(json => {
-                  const beer = json.response.beer;
-                  this.$set(props.item, "beer", beer);
-                  storage.setItem(props.item.name, JSON.stringify(beer));
-                  this.$set(props.item, "loading", false);
-                  props.expanded = !props.expanded;
-                });
-            } else {
-              props.item.error = "Untappd rating not found.";
-              props.item.beer.rating_score = 0;
-              this.$set(props.item, "loading", false);
-              props.expanded = !props.expanded;
-            }
+        this.getBeer(props.item.name)
+          .then(beer => {
+            this.$set(props.item, "beer", beer);
+            this.$set(props.item, "rating", beer.rating_score || null);
+          })
+          .catch(error => {
+            props.item.error = error;
+          })
+          .finally(() => {
+            this.$set(props.item, "loading", false);
+            props.expanded = !props.expanded;
           });
       } else {
         props.expanded = !props.expanded;
@@ -232,6 +265,9 @@ export default {
       handler() {
         if (this.$route.params.name) {
           this.search = this.$route.params.name;
+          if (this.taplist) {
+            this.loadAllBeers();
+          }
         } else {
           this.search = null;
         }

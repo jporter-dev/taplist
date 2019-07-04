@@ -9,8 +9,10 @@ import bugsnagVue from "@bugsnag/plugin-vue";
 //import "./registerServiceWorker";
 import "vuetify/dist/vuetify.min.css"; // Ensure you are using css-loader
 
-const bugsnagClient = bugsnag(process.env.VUE_APP_BUGSNAG);
-bugsnagClient.use(bugsnagVue, Vue);
+if (process.env.NODE_ENV !== "development") {
+  const bugsnagClient = bugsnag(process.env.VUE_APP_BUGSNAG);
+  bugsnagClient.use(bugsnagVue, Vue);
+}
 
 Vue.use(Vuetify);
 
