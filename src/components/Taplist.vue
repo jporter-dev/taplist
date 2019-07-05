@@ -41,7 +41,7 @@
               color="amber"
             ></v-progress-circular>
             <div v-else>
-              <template>
+              <template v-if="$vuetify.breakpoint.mdAndUp">
                 <v-rating
                   v-model="props.item.rating"
                   color="yellow darken-3"
@@ -53,6 +53,9 @@
                 <span class="grey--text text--lighten-2 caption ml-2">
                   ({{ props.item.rating || "Click to load" }})
                 </span>
+              </template>
+              <template v-else>
+                {{ props.item.rating }}
               </template>
             </div>
           </td>
