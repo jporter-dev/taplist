@@ -213,9 +213,9 @@ export default {
         if (beer) {
           resolve(beer);
         } else {
-          let url = `https://api.untappd.com/v4/search/beer?q=${name}&access_token=${
-            this.untappd
-          }`;
+          let url = `https://api.untappd.com/v4/search/beer?q=${encodeURIComponent(
+            name
+          )}&access_token=${this.untappd}`;
           if (fetchBeer) {
             fetch(url)
               .then(response => response.json())
