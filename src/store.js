@@ -11,14 +11,15 @@ const store = new Vuex.Store({
       storage: {
         getItem: key => Cookies.get(key),
         setItem: (key, value) =>
-          Cookies.set(key, value, { expires: 90, secure: true }),
+          Cookies.set(key, value, { expires: 666, secure: true }),
         removeItem: key => Cookies.remove(key)
       },
-      paths: ["untappd"]
+      paths: ["untappd", "favorites"]
     })
   ],
   state: {
     drawer: null,
+    favorites: {},
     last_updated: null,
     last_updated_timestamp: null,
     loading: true,
@@ -32,6 +33,9 @@ const store = new Vuex.Store({
     untappd_user: null
   },
   mutations: {
+    TOGGLE_FAVORITE(state, venue) {
+      Vue.set(state.favorites, venue, !state.favorites[venue]);
+    },
     SET_DATA(state, data) {
       state.loading = false;
       state.taplist = data.taplist;

@@ -6,6 +6,7 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       fixed
     >
+      <venues title="Favorite Venues" favs></venues>
       <venues></venues>
     </v-navigation-drawer>
     <v-navigation-drawer
