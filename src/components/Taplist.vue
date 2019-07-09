@@ -76,7 +76,7 @@
                   <v-flex shrink mr-5>
                     <h3>
                       Your Rating
-                      <span class="caption" v-if="props.item.beer"
+                      <span class="caption" v-if="props.item.beer.stats"
                         >({{
                           props.item.beer.stats.user_count === 0
                             ? "N/A"

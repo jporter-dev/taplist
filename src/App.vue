@@ -5,6 +5,7 @@
       v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       fixed
+      overflow-hidden
     >
       <venues title="Favorite Venues" favs></venues>
       <venues></venues>
@@ -15,6 +16,7 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       fixed
       right
+      overflow-hidden
     >
       <settings></settings>
     </v-navigation-drawer>
