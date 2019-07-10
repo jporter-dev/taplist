@@ -5,7 +5,6 @@
       v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       fixed
-      overflow-hidden
     >
       <venues title="Favorite Venues" favs></venues>
       <venues></venues>
@@ -16,7 +15,6 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       fixed
       right
-      overflow-hidden
     >
       <settings></settings>
     </v-navigation-drawer>
@@ -49,9 +47,9 @@
     </v-toolbar>
     <v-content>
       <v-container fluid>
-        <!-- <v-alert :value="true" type="warning">
-          Checkin data currently disabled.
-        </v-alert> -->
+        <UntappdAuth
+          v-if="!$store.state.untappd && $vuetify.breakpoint.mdAndDown"
+        ></UntappdAuth>
         <router-view></router-view>
       </v-container>
     </v-content>
@@ -65,9 +63,10 @@
 <script>
 import Venues from "@/components/Venues.vue";
 import Settings from "@/components/Settings.vue";
+import UntappdAuth from "@/components/UntappdAuth.vue";
 import { mapState } from "vuex";
 export default {
-  components: { Venues, Settings },
+  components: { Venues, Settings, UntappdAuth },
   computed: {
     ...mapState(["last_updated", "last_updated_timestamp", "untappd_user"]),
     needsUpdate() {

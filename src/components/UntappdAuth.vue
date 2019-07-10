@@ -1,5 +1,5 @@
 <template>
-  <v-layout ma-2>
+  <v-layout>
     <v-btn
       v-if="!untappd"
       color="yellow darken-3"

@@ -1,7 +1,7 @@
 <template>
   <v-layout row wrap>
     <v-flex xs12>
-      <UntappdAuth></UntappdAuth>
+      <UntappdAuth class="ma-2"></UntappdAuth>
       <UntappdFeed></UntappdFeed>
       <v-divider></v-divider>
       <v-btn block flat @click="showTools = !showTools"
