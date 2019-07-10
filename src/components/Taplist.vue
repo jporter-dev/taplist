@@ -76,13 +76,16 @@
                   <v-flex shrink mr-5>
                     <h3>
                       Your Rating
-                      <span class="caption" v-if="props.item.beer.stats"
-                        >({{
+                      <span
+                        class="caption"
+                        v-if="props.item.beer && props.item.beer.stats"
+                      >
+                        ({{
                           props.item.beer.stats.user_count === 0
                             ? "N/A"
                             : props.item.beer.auth_rating
-                        }})</span
-                      >
+                        }})
+                      </span>
                     </h3>
                   </v-flex>
                   <v-flex grow>
