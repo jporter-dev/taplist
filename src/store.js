@@ -58,6 +58,7 @@ const store = new Vuex.Store({
       state.untappd_user = payload;
     },
     LOGOUT(state) {
+      state.rightDrawer = null;
       state.untappd = null;
       state.untappd_user = null;
     }

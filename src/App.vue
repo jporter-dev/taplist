@@ -30,26 +30,27 @@
         ></v-toolbar-side-icon>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-toolbar-title>
+      <v-toolbar-title v-if="untappd">
         <v-toolbar-side-icon to="/" active-class="">
           <img src="@/assets/logo-color-64x64.png" alt="Beer" height="32" />
         </v-toolbar-side-icon>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-title>
-        <v-toolbar-side-icon @click.stop="rightDrawer = !rightDrawer">
-          <v-avatar v-if="untappd_user" :size="34">
-            <img :src="untappd_user.user_avatar" alt="avatar" />
+        <v-btn v-if="untappd" icon>
+          <v-avatar :size="34" @click.stop="rightDrawer = !rightDrawer">
+            <img
+              :src="untappd_user.user_avatar"
+              alt="avatar"
+              v-if="untappd_user"
+            />
           </v-avatar>
-          <v-icon v-else>person</v-icon>
-        </v-toolbar-side-icon>
+        </v-btn>
+        <UntappdAuth v-else label="Log In"></UntappdAuth>
       </v-toolbar-title>
     </v-toolbar>
     <v-content>
       <v-container fluid>
-        <UntappdAuth
-          v-if="!$store.state.untappd && $vuetify.breakpoint.mdAndDown"
-        ></UntappdAuth>
         <router-view></router-view>
       </v-container>
     </v-content>
@@ -68,7 +69,12 @@ import { mapState } from "vuex";
 export default {
   components: { Venues, Settings, UntappdAuth },
   computed: {
-    ...mapState(["last_updated", "last_updated_timestamp", "untappd_user"]),
+    ...mapState([
+      "last_updated",
+      "last_updated_timestamp",
+      "untappd_user",
+      "untappd"
+    ]),
     needsUpdate() {
       if (!this.last_updated_timestamp) return false;
       const delta =

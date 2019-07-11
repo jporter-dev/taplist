@@ -8,7 +8,7 @@
         `https://untappd.com/oauth/authenticate/?client_id=${untappd_client_id}&response_type=code&redirect_url=${redirect_url}`
       "
     >
-      Log In with Untappd {{ untappd }}
+      {{ label }}
     </v-btn>
     <v-btn v-else block @click="LOGOUT">
       Log Out
@@ -20,6 +20,7 @@
 import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
+  props: { label: { type: String, default: "Log In with Untappd" } },
   data() {
     return {
       redirect_url: `//${window.location.host}`,
