@@ -1,7 +1,7 @@
 <template>
   <v-layout row wrap>
     <v-flex xs12>
-      <UntappdAuth class="ma-2"></UntappdAuth>
+      <UntappdAuth class="ma-2" v-if="$store.state.untappd"></UntappdAuth>
       <UntappdFeed></UntappdFeed>
       <v-divider></v-divider>
       <v-btn block flat @click="showTools = !showTools"
