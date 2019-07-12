@@ -29,7 +29,7 @@ const store = new Vuex.Store({
     untappd: (() =>
       process.env.NODE_ENV === "development"
         ? process.env.VUE_APP_UNTAPPD_DEV
-        : null)(),
+        : undefined)(),
     untappd_user: null
   },
   mutations: {
