@@ -47,6 +47,7 @@ export default {
   },
   mounted() {
     if (!this.untappd && this.$route.query.code) {
+      console.log("fetching auth");
       fetch(
         `${this.redirect_url}/untappd/oauth/authorize/?client_id=${
           this.untappd_client_id
@@ -58,6 +59,7 @@ export default {
       )
         .then(response => response.json())
         .then(json => {
+          console.log("setting token", json);
           this.SET_UNTAPPD(json.response.access_token);
           this.$router.push({ ...this.$route, query: {} });
         });
