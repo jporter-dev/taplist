@@ -19,7 +19,7 @@
       <settings></settings>
     </v-navigation-drawer>
     <v-toolbar
-      color="yellow darken-3"
+      color="primary"
       app
       light
       fixed
@@ -48,7 +48,7 @@
             />
           </v-avatar>
         </v-btn>
-        <UntappdAuth v-else label="Log In"></UntappdAuth>
+        <UntappdAuth v-else label="Login"></UntappdAuth>
       </v-toolbar-title>
     </v-toolbar>
     <v-content>

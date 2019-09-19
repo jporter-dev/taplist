@@ -7,14 +7,19 @@ import bugsnag from "@bugsnag/js";
 import bugsnagVue from "@bugsnag/plugin-vue";
 
 //import "./registerServiceWorker";
-import "vuetify/dist/vuetify.min.css"; // Ensure you are using css-loader
+import "vuetify/dist/vuetify.min.css";
+import colors from "vuetify/es5/util/colors";
 
 if (process.env.NODE_ENV !== "development") {
   const bugsnagClient = bugsnag(process.env.VUE_APP_BUGSNAG);
   bugsnagClient.use(bugsnagVue, Vue);
 }
 
-Vue.use(Vuetify);
+Vue.use(Vuetify, {
+  theme: {
+    primary: colors.amber.darken1
+  }
+});
 
 Vue.config.productionTip = false;
 

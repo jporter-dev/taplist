@@ -148,9 +148,13 @@
                     )}'`
                   "
                   target="_BLANK"
-                  color="amber darken-1"
+                  color="primary"
+                  block
                   >View on Untappd</v-btn
                 >
+                <v-btn block color="secondary" @click="loadRow(props, true)">
+                  Reload Rating
+                </v-btn>
               </v-flex>
             </v-layout>
           </v-card-text>
@@ -209,11 +213,11 @@ export default {
         }
       });
     },
-    getBeer(name, fetchBeer = true) {
+    getBeer(name, fetchBeer = true, reload = false) {
       return new Promise((resolve, reject) => {
         let storage = window.localStorage;
         let beer = JSON.parse(storage.getItem(name));
-        if (beer) {
+        if (beer && !reload) {
           resolve(beer);
         } else {
           let url = `https://api.untappd.com/v4/search/beer?q=${encodeURIComponent(
@@ -246,21 +250,24 @@ export default {
         }
       });
     },
+    loadRow(props, reload = false) {
+      this.getBeer(props.item.name, true, reload)
+        .then(beer => {
+          this.$set(props.item, "beer", beer);
+          this.$set(props.item, "rating", beer.rating_score || null);
+        })
+        .catch(error => {
+          props.item.error = error;
+        })
+        .finally(() => {
+          this.$set(props.item, "loading", false);
+          props.expanded = !props.expanded;
+        });
+    },
     clicked(props) {
       if (!props.expanded) {
         this.$set(props.item, "loading", true);
-        this.getBeer(props.item.name)
-          .then(beer => {
-            this.$set(props.item, "beer", beer);
-            this.$set(props.item, "rating", beer.rating_score || null);
-          })
-          .catch(error => {
-            props.item.error = error;
-          })
-          .finally(() => {
-            this.$set(props.item, "loading", false);
-            props.expanded = !props.expanded;
-          });
+        this.loadRow(props);
       } else {
         props.expanded = !props.expanded;
       }

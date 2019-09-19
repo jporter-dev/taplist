@@ -4,7 +4,7 @@
       title
     }}</v-subheader>
     <template v-for="(total, venue) in venues">
-      <v-list-tile :key="venue + 'tile'" :to="`/venue/${venue}`">
+      <v-list-tile :key="venue + 'tile'" :to="`/venue/${venue}`" v-ripple>
         <v-list-tile-action @click.prevent="TOGGLE_FAVORITE(venue)">
           <v-icon v-if="favorites[venue]" color="yellow darken-3">star</v-icon>
           <v-icon v-else>star_border</v-icon>

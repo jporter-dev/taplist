@@ -2,7 +2,6 @@
   <v-layout>
     <v-btn
       v-if="!untappd"
-      color="yellow darken-3"
       block
       :href="
         `https://untappd.com/oauth/authenticate/?client_id=${untappd_client_id}&response_type=code&redirect_url=${redirect_url}`

@@ -40,7 +40,6 @@ export default {
       window.localStorage.clear();
     },
     showUntappdInfo() {
-      alert(this.$store.state.untappd);
       alert(JSON.stringify(this.$store.state.untappd_user));
     }
   }
