@@ -19,7 +19,9 @@
       <settings></settings>
     </v-navigation-drawer>
     <v-toolbar
+      color="yellow darken-3"
       app
+      light
       fixed
       :clipped-left="$vuetify.breakpoint.lgAndUp"
       :clipped-right="$vuetify.breakpoint.lgAndUp"
