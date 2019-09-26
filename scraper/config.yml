@@ -11,8 +11,11 @@ sites:
     url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
     selector: '.beer .beerlisting span'
   - name: The Wine Source
-    url: https://www.beermenus.com/places/14642-the-wine-source
-    selector: '#on_tap li.pure-list-item h3 > a'
+    url: https://untappd.com/v/the-wine-source/106632
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
   - name: Waverly Brewing Co
     url: http://waverlybrewingcompany.com/on-tap/
     selector: '.beer > .beer-details > p.beer-name > a'
