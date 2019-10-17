@@ -12,6 +12,7 @@ sites:
     selector: '.beer .beerlisting span'
   - name: The Wine Source
     url: https://untappd.com/v/the-wine-source/106632
+    untappd: true
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
@@ -37,32 +38,38 @@ sites:
     namefilter: !!js/function 'function(word){ return `Union ${word}` }'
   - name: Pratt Street Ale House
     url: https://untappd.com/v/pratt-street-ale-house/3424
+    untappd: true
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
   - name: Five and Dime Ale House
     url: https://untappd.com/v/five-and-dime-ale-house/5490279
+    untappd: true
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
   - name: The Ale House Columbia
     url: https://untappd.com/v/the-ale-house-columbia/498845
+    untappd: true
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
   - name: Bo Brooks Lighthouse Liquors
     url: https://untappd.com/v/bo-brooks-lighthouse-liquors/115560
+    untappd: true
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
     namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
   - name: Whitey's Liquors
     url: https://untappd.com/v/whiteys-liqours/987185
+    untappd: true
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
   - name: Perfect Pour
     url: https://untappd.com/v/the-perfect-pour/134414
+    untappd: true
     selector: '.menu-area .menu-section:first-child .beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
@@ -84,8 +91,7 @@ sites:
     selector: '.section-items-container .item-title-color > .item-info'
     beerSelector: 'span.item'
     brewerySelector: 'span.brewery'
-  - name: Snallygaster 2019
-    url: https://untappd.com/v/snallygaster-2019/9387619
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
+  - name: Diamondback Brewing Co
+    url: https://untappd.com/user/-josh/lists/635751
+    selector: '#yui_3_17_2_1_1571274357426_336 > div.menu.menu-1-a74ccf74-d786-4df2-8084-63b8ed2d38fb > div.menu-section > div.menu-items > div.menu-item > div.menu-item-title'
+    namefilter: !!js/function 'function(word){ return `Diamondback Brewing Co ${word}` }'
