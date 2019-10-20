@@ -241,7 +241,8 @@ export default {
                       const beer = json.response.beer;
                       storage.setItem(name, JSON.stringify(beer));
                       resolve(beer);
-                    });
+                    })
+                    .catch(() => storage.clear());
                 }
               });
           } else {
