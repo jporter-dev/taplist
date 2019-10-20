@@ -242,7 +242,10 @@ export default {
                       storage.setItem(name, JSON.stringify(beer));
                       resolve(beer);
                     })
-                    .catch(() => storage.clear());
+                    .catch(() => {
+                      storage.clear();
+                      this.getBeer(name, fetchBeer, reload);
+                    });
                 }
               });
           } else {
