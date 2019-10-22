@@ -93,5 +93,5 @@ sites:
     brewerySelector: 'span.brewery'
   - name: Diamondback Brewing Co
     url: http://www.diamondbackbeer.com/taproom-kitchen
-    selector: 'div.menu.menu-1-a74ccf74-d786-4df2-8084-63b8ed2d38fb > div.menu-section > div.menu-items > div.menu-item > div.menu-item-title'
+    selector: '.sqs-layout > .row:nth-child(2) .menu:nth-child(2) > .menu-section:nth-child(-n+2) > .menu-items > .menu-item > .menu-item-title'
     namefilter: !!js/function 'function(word){ return `Diamondback Brewing Co ${word}` }'
