@@ -81,7 +81,7 @@ sites:
   - name: Sapwood Cellars
     url: https://sapwoodcellars.com/what-do-we-have/
     selector: '.et_pb_section .et_pb_row.et_pb_row_2 > .et_pb_column > .et_pb_module > .et_pb_text_inner > p > span > strong'
-    namefilter: !!js/function 'function(word){ return `Sapwood Cellars ${word}` }'
+    namefilter: !!js/function 'function(word){ word = word.split(":"); if (word && word.length >= 2) return `Sapwood Cellars ${word[0].replace(/[\-\:\–\*].*/g, "").trim()}` }'
   - name: Black Flag Brewing Co
     url: https://www.blackflagbrewingco.com
     selector: '.taplist > tbody > tr > td:first-child'
