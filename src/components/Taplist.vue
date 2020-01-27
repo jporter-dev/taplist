@@ -220,6 +220,9 @@ export default {
         if (beer && !reload) {
           resolve(beer);
         } else {
+          if (!this.untappd) {
+            reject("You must be logged in to view Untappd data.");
+          }
           let url = `https://api.untappd.com/v4/search/beer?q=${encodeURIComponent(
             name
           )}&access_token=${this.untappd}`;
