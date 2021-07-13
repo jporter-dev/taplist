@@ -3,20 +3,20 @@ sites:
   - name: Wet City
     url: http://wetcitybrewing.com/
     selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
-    namefilter: !!js/function 'function(word){let x = word.split(" by "); let z = x.splice(x.length-1, 1); x.unshift(z[0]); return x.join(" ")}'
+    namefilter: !!js/function 'function(word){ word = word.replace(/\d+oz.*/, "").trim(); return word.indexOf(":") < 0 ? "Wet City "+word : word.replace(":", "") }'
   - name: Max's Taphouse
     url: http://maxs.com/
-    selector: '#sidebar .content ul > li'
+    selector: 'li.product > a:nth-child(1) > h2:nth-child(2)'
   - name: The Brass Tap
     url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
     selector: '.beer .beerlisting span'
-  - name: The Wine Source
-    url: https://untappd.com/v/the-wine-source/106632
-    untappd: true
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-    namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
+  # - name: The Wine Source
+  #   url: https://untappd.com/v/the-wine-source/106632
+  #   untappd: true
+  #   selector: '.beer-info'
+  #   beerSelector: 'h5 a'
+  #   brewerySelector: 'h6 a'
+  #   namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
   - name: Waverly Brewing Co
     url: http://waverlybrewingcompany.com/on-tap/
     selector: '.beer > .beer-details > p.beer-name > a'
@@ -29,19 +29,16 @@ sites:
     url: http://www.friscogrille.com/wcmobile-alt.php
     selector: '.name'
     namefilter: !!js/function 'function(word) { return word.replace(/\*/g ,"") }'
-  - name: Growler USA
-    url: https://growlerusa.com/craft-beer-pubs/baltimore-rotunda/whats-on-tap/
-    selector: '#taphunter-taps div.taphunter-row span.beer-name > a.productlink span'
   - name: Union Craft Brewing
     url: https://www.unioncraftbrewing.com/
     selector: '#projects .project .inside a > span.title'
     namefilter: !!js/function 'function(word){ return `Union ${word}` }'
   - name: Pratt Street Ale House
-    url: https://untappd.com/v/pratt-street-ale-house/3424
+    url: https://www.prattstreetalehouse.com/food-menu
     untappd: true
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
+    selector: 'div.menu:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div'
+    beerSelector: '.menu-item-title'
+    brewerySelector: '.menu-item-description'
   - name: Five and Dime Ale House
     url: https://untappd.com/v/five-and-dime-ale-house/5490279
     untappd: true
@@ -74,10 +71,10 @@ sites:
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
     namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
-  - name: Nepenthe Brewing Co
-    url: https://www.nepenthebrewingco.com/on-tap
-    selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
-    namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Co ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
+  # - name: Nepenthe Brewing Co
+  #   url: https://www.nepenthebrewingco.com/on-tap
+  #   selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
+  #   namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Co ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
   - name: Sapwood Cellars
     url: https://sapwoodcellars.com/what-do-we-have/
     selector: '.et_pb_section .et_pb_row.et_pb_row_2 > .et_pb_column > .et_pb_module > .et_pb_text_inner > p > span > strong'
@@ -92,6 +89,6 @@ sites:
     beerSelector: 'span.item'
     brewerySelector: 'span.brewery'
   - name: Diamondback Brewing Co
-    url: http://www.diamondbackbeer.com/taproom-kitchen
-    selector: '.sqs-layout > .row:nth-child(2) .menu:nth-child(2) > .menu-section:nth-child(-n+2) > .menu-items > .menu-item > .menu-item-title'
+    url: https://www.diamondbackbeer.com/menu
+    selector: 'div.menu:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(2)'
     namefilter: !!js/function 'function(word){ return `Diamondback Brewing Co ${word}` }'
