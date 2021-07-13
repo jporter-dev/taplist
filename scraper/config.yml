@@ -5,7 +5,7 @@ sites:
     selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
     namefilter: !!js/function 'function(word){ word = word.replace(/\d+oz.*/, "").trim(); return word.indexOf(":") < 0 ? "Wet City "+word : word.replace(":", "") }'
   - name: Max's Taphouse
-    url: http://maxs.com/draft-beers/
+    url: https://shop.maxs.com/draft-beers/
     selector: 'li.product > a:nth-child(1) > h2:nth-child(2)'
   - name: The Brass Tap
     url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
