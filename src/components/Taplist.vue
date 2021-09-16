@@ -63,7 +63,7 @@
       </template>
       <template v-slot:expand="props">
         <v-card flat color="grey darken-1">
-          <v-card-text v-if="untappd">
+          <v-card-text v-if="!untappd">
             <v-layout row justify-center v-if="props.item.beer">
               <v-flex xs12 md6 my-2>
                 <h3 class="mb-2">Description</h3>
@@ -198,14 +198,14 @@ export default {
       set(search) {
         this.$store.commit("SET_SEARCH", search);
       }
-    },
-    untappdURL(item) {
-      if (navigator.userAgent.toLowerCase().match(/mobile/i))
-        return `untappd://beer/${item.beer.bid}`;
-      return `https://untappd.com/search?q='${encodeURIComponent(item.name)}'`;
     }
   },
   methods: {
+    untappdURL(item) {
+      if (navigator.userAgent.toLowerCase().match(/mobile/i) && item.beer)
+        return `untappd://beer/${item.beer.bid}`;
+      return `https://untappd.com/search?q='${encodeURIComponent(item.name)}'`;
+    },
     loadAllBeers() {
       this.taplist.map((item, i) => {
         if (item.location === this.$route.params.name) {
