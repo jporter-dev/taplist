@@ -5,7 +5,7 @@
 
 ## Development
 
-The project consists of two portions - the main webapp, and the Cloudflare Worker. The worker manages access to the KV, acts as a proxy, and manages scheduled deploys.
+The project consists of three portions - the main webapp hosted on Cloudflare Pages, the Cloudflare Worker, and the Workers KV which is accessed via the Cloudflare Worker. The worker manages access to the KV, acts as a proxy, and manages scheduled deploys.
 
 ### Cloudflare worker
 
@@ -36,6 +36,8 @@ npm run scrape
 ```
 
 ### Deploy the site
+
+Deploys are done automatically when committing. Cloudflare Pages is configure to use this command when deploying.
 
 ```bash
 npm run deploy
