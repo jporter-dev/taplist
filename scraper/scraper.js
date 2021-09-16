@@ -6,7 +6,7 @@ const yaml = require("js-yaml");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 dotenv.config();
 
