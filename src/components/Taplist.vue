@@ -63,7 +63,7 @@
       </template>
       <template v-slot:expand="props">
         <v-card flat color="grey darken-1">
-          <v-card-text v-if="!untappd">
+          <v-card-text v-if="untappd">
             <v-layout row justify-center v-if="props.item.beer">
               <v-flex xs12 md6 my-2>
                 <h3 class="mb-2">Description</h3>
