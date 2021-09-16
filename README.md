@@ -1,7 +1,6 @@
 # Baltimore Taplist
 
-> The goal of this project was to create a unified, sortable, and searchable taplist for the popular bars and breweries around town. Untappd ratings are tied in so it can be used for deciding on a destination when going out.
-
+> The goal of this project was to create a unified, sortable, and searchable taplist for the popular bars and breweries around town. Untappd ratings are tied in so users can choose venues that have a good beer selection when going out.
 
 ## Development
 
