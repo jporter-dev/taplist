@@ -26,6 +26,7 @@ const store = new Vuex.Store({
     rightDrawer: null,
     search: null,
     taplist: null,
+    venues: null,
     untappd: (() =>
       process.env.NODE_ENV === "development"
         ? process.env.VUE_APP_UNTAPPD_DEV
@@ -38,7 +39,10 @@ const store = new Vuex.Store({
     },
     SET_DATA(state, data) {
       state.loading = false;
-      state.taplist = data.taplist;
+      state.taplist = Object.values(data).reduce(
+        (a, d) => a.concat(d.beers),
+        []
+      );
       state.last_updated = new Date(data.last_updated).toLocaleString();
       state.last_updated_timestamp = data.last_updated;
     },
@@ -65,7 +69,8 @@ const store = new Vuex.Store({
   },
   actions: {
     getData(store) {
-      fetch("/taplist.json", { cache: "no-store" })
+      const url = `${process.env.VUE_APP_TAPLIST_URL}/taplist`;
+      fetch(url, { cache: "no-store" })
         .then(response => response.json())
         .then(json => store.commit("SET_DATA", json));
     },

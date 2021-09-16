@@ -6,6 +6,7 @@ const yaml = require("js-yaml");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
+const fetch = require("node-fetch");
 
 dotenv.config();
 
@@ -78,6 +79,21 @@ async function main() {
       await parseSite(site)
         .then(beers => {
           db = db.concat(beers);
+          let url = `https://taplist-worker.codecaffeinated.workers.dev/brewery/${
+            site.name
+          }`;
+          let last_updated = Date.now();
+          fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+              last_updated,
+              url: site.url,
+              beers
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8"
+            }
+          });
         })
         .catch(e => {
           browser.close().then(() => {
@@ -85,15 +101,6 @@ async function main() {
           });
         });
     }
-    console.log("writing to file");
-    fs.writeFileSync(
-      path.resolve(__dirname, "../public/taplist.json"),
-      JSON.stringify({
-        taplist: db,
-        last_updated: Date.now(),
-        uniqueCounts: {}
-      })
-    );
   } catch (e) {
     console.log(e);
   }
