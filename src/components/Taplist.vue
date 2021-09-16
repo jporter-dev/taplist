@@ -164,6 +164,12 @@
         </v-card>
       </template>
     </v-data-table>
+    <div class="text-xs-center py-1" v-else>
+      <v-progress-linear
+        :indeterminate="true"
+        color="amber"
+      ></v-progress-linear>
+    </div>
   </v-card>
 </template>
 

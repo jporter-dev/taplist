@@ -48,7 +48,9 @@ export default {
     if (!this.untappd && this.$route.query.code) {
       console.log("fetching auth");
       fetch(
-        `${process.env.VUE_APP_TAPLIST_URL}/untappd/oauth/authorize/?client_id=${
+        `${
+          process.env.VUE_APP_TAPLIST_URL
+        }/untappd/oauth/authorize/?client_id=${
           this.untappd_client_id
         }&client_secret=${
           this.untappd_client_secret
