@@ -143,9 +143,7 @@
               <v-flex xs6 md3>
                 <v-btn
                   :href="
-                    `https://untappd.com/search?q='${encodeURIComponent(
-                      props.item.name
-                    )}'`
+                    `${untappdURL}?q='${encodeURIComponent(props.item.name)}'`
                   "
                   target="_BLANK"
                   color="primary"
@@ -202,6 +200,11 @@ export default {
       set(search) {
         this.$store.commit("SET_SEARCH", search);
       }
+    },
+    untappdURL() {
+      if (navigator.userAgent.toLowerCase().match(/mobile/i))
+        return "untappd://search";
+      return "https://untappd.com/search";
     }
   },
   methods: {
