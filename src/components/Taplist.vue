@@ -142,9 +142,7 @@
               </v-flex>
               <v-flex xs6 md3>
                 <v-btn
-                  :href="
-                    `${untappdURL}?q='${encodeURIComponent(props.item.name)}'`
-                  "
+                  :href="untappdURL(props.item)"
                   target="_BLANK"
                   color="primary"
                   block
@@ -201,10 +199,10 @@ export default {
         this.$store.commit("SET_SEARCH", search);
       }
     },
-    untappdURL() {
+    untappdURL(item) {
       if (navigator.userAgent.toLowerCase().match(/mobile/i))
-        return "untappd://search";
-      return "https://untappd.com/search";
+        return `untappd://beer/${item.beer.bid}`;
+      return `https://untappd.com/search?q='${encodeURIComponent(item.name)}'`;
     }
   },
   methods: {
