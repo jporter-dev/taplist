@@ -257,6 +257,9 @@ export default {
                       this.getBeer(name, fetchBeer, reload);
                     });
                 }
+              })
+              .catch(() => {
+                reject("Unable to communicate Untappd.");
               });
           } else {
             resolve(null);
