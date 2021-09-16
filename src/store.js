@@ -43,8 +43,12 @@ const store = new Vuex.Store({
         (a, d) => a.concat(d.beers),
         []
       );
-      state.last_updated = new Date(data.last_updated).toLocaleString();
-      state.last_updated_timestamp = data.last_updated;
+      const last_updated = Object.values(data).reduce(
+        (max, d) => Math.max(max, d.last_updated),
+        0
+      );
+      state.last_updated = new Date(last_updated).toLocaleString();
+      state.last_updated_timestamp = last_updated;
     },
     SET_DRAWER(state, payload) {
       state.drawer = payload;
