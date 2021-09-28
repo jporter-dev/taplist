@@ -101,3 +101,5 @@ sites:
   - name: Snallygaster 2021
     url: https://docs.google.com/spreadsheets/d/e/2PACX-1vQxJVhkXtcyfTjEwx1VBSB-LLAhV34EmO9ExDXyyKQxDn2HCCGiT_7K-sv1cLZwTeGmGxl6YM3F03Qw/pubhtml
     selector: 'table > tbody > tr'
+    beerSelector: 'td + td'
+    brewerySelector: 'th + td'
