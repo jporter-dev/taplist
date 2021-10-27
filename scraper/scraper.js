@@ -80,7 +80,7 @@ async function main() {
       await parseSite(site)
         .then(beers => {
           db = db.concat(beers);
-          let url = `https://taplist-worker.codecaffeinated.workers.dev/brewery/${
+          let url = `https://taplist-worker.prtr.workers.dev/brewery/${
             site.name
           }`;
           let last_updated = Date.now();
