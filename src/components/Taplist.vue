@@ -142,11 +142,7 @@
               </v-flex>
               <v-flex xs6 md3>
                 <v-btn
-                  :href="
-                    `https://untappd.com/search?q='${encodeURIComponent(
-                      props.item.name
-                    )}'`
-                  "
+                  :href="untappdURL(props.item)"
                   target="_BLANK"
                   color="primary"
                   block
@@ -164,6 +160,12 @@
         </v-card>
       </template>
     </v-data-table>
+    <div class="text-xs-center py-1" v-else>
+      <v-progress-linear
+        :indeterminate="true"
+        color="amber"
+      ></v-progress-linear>
+    </div>
   </v-card>
 </template>
 
@@ -199,6 +201,11 @@ export default {
     }
   },
   methods: {
+    untappdURL(item) {
+      if (navigator.userAgent.toLowerCase().match(/mobile/i) && item.beer)
+        return `untappd://beer/${item.beer.bid}`;
+      return `https://untappd.com/search?q='${encodeURIComponent(item.name)}'`;
+    },
     loadAllBeers() {
       this.taplist.map((item, i) => {
         if (item.location === this.$route.params.name) {
@@ -250,6 +257,9 @@ export default {
                       this.getBeer(name, fetchBeer, reload);
                     });
                 }
+              })
+              .catch(() => {
+                reject("Unable to communicate Untappd.");
               });
           } else {
             resolve(null);
