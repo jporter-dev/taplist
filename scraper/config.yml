@@ -1,105 +1,64 @@
----
+# Venue scraping definitions. Validated 2026-07-11.
+#
+# Fields:
+#   name             venue display name (becomes `location` on each beer)
+#   url              page or API endpoint to scrape
+#   mode             fetch (static HTML via cheerio, default) | browser (Playwright) | json (API)
+#   selector         CSS selector for beer entries (fetch/browser modes)
+#   beerSelector     optional sub-selector for the beer name within `selector`
+#   brewerySelector  optional sub-selector for the brewery; output is "<brewery> <beer>"
+#   listKey          json mode: dot-path to the array in the response
+#   fields           json mode: item fields joined with spaces to form the name
+#   namefilter       optional named function exported from filters.js
 sites:
   - name: Wet City
-    url: http://wetcitybrewing.com/
-    selector: '#post-14 > div > div > div:nth-child(2) > div > .item-header > h4.name'
-    namefilter: !!js/function 'function(word){ word = word.replace(/\d+oz.*/, "").trim(); return word.indexOf(":") < 0 ? "Wet City "+word : word.replace(":", "") }'
-  - name: Max's Taphouse
-    url: https://shop.maxs.com/draft-beers/
-    selector: 'li.product > a:nth-child(1) > h2:nth-child(2)'
+    url: https://wetcitybrewing.com/
+    selector: '.items .item .item-header h4.name'
+    namefilter: wetCity
+  - name: "Max's Taphouse"
+    url: https://shop.maxs.com/wp-json/jd/v2/retrieve_customer_draft_list/get_drafts
+    mode: json
+    listKey: drafts
+    fields: [brewery, name]
   - name: The Brass Tap
     url: https://www.brasstapbeerbar.com/beer/Baltimore/draft
     selector: '.beer .beerlisting span'
-  # - name: The Wine Source
-  #   url: https://untappd.com/v/the-wine-source/106632
-  #   untappd: true
-  #   selector: '.beer-info'
-  #   beerSelector: 'h5 a'
-  #   brewerySelector: 'h6 a'
-  #   namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
-  - name: Waverly Brewing Co
-    url: http://waverlybrewingcompany.com/on-tap/
-    selector: '.beer > .beer-details > p.beer-name > a'
-    namefilter: !!js/function 'function(word){ return `Waverly Brewing ${word}` }'
-  - name: Frisco's Taphouse - Columbia
-    url: http://www.friscogrille.com/cmobile-alt.php
-    selector: '.name'
-    namefilter: !!js/function 'function(word) { return word.replace(/\*/g ,"") }'
-  - name: Frisco's Taphouse - Crofton
-    url: http://www.friscogrille.com/wcmobile-alt.php
-    selector: '.name'
-    namefilter: !!js/function 'function(word) { return word.replace(/\*/g ,"") }'
   - name: Union Craft Brewing
     url: https://www.unioncraftbrewing.com/
-    selector: '#projects .project .inside a > span.title'
-    namefilter: !!js/function 'function(word){ return `Union ${word}` }'
-  - name: Pratt Street Ale House
-    url: https://www.prattstreetalehouse.com/food-menu
-    untappd: true
-    selector: 'div.menu:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div'
-    beerSelector: '.menu-item-title'
-    brewerySelector: '.menu-item-description'
-  - name: Five and Dime Ale House
-    url: https://untappd.com/v/five-and-dime-ale-house/5490279
-    untappd: true
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
+    selector: '.list-item-content__text-wrapper h2'
+    namefilter: union
   - name: The Ale House Columbia
     url: https://untappd.com/v/the-ale-house-columbia/498845
-    untappd: true
+    mode: browser
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
-  - name: Bo Brooks Lighthouse Liquors
-    url: https://untappd.com/v/bo-brooks-lighthouse-liquors/115560
-    untappd: true
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-    namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
-  - name: Whitey's Liquors
-    url: https://untappd.com/v/whiteys-liqours/987185
-    untappd: true
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-  - name: Perfect Pour
-    url: https://untappd.com/v/the-perfect-pour/134414
-    untappd: true
-    selector: '.menu-area .menu-section:first-child .beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-    namefilter: !!js/function 'function(word) { return word.replace(/\d{1,2}\. /g ,"") }'
-  # - name: Nepenthe Brewing Co
-  #   url: https://www.nepenthebrewingco.com/on-tap
-  #   selector: '.strc1 > .strc1inlineContent > div:not(.mc1) [class$=GroupSkin] [class$=GroupSkininlineContent] [id$=gridContainer] > div:first-child > .font_0:first-child > span:first-child'
-  #   namefilter: !!js/function 'function(word){ return `Nepenthe Brewing Co ${word.replace(/^[\s_]+|[\s_]+$/g, "").replace(/[_\s]+/g, " ").replace(/^[a-z]/, function(m) { return m.toUpperCase() })}` }'
+    namefilter: stripLeadingNumbers
   - name: Sapwood Cellars
-    url: https://sapwoodcellars.com/what-do-we-have/
-    selector: '.et_pb_section .et_pb_row.et_pb_row_2 > .et_pb_column > .et_pb_module > .et_pb_text_inner > p > span > strong'
-    namefilter: !!js/function 'function(word){ word = word.split(":"); if (word && word.length >= 2) return `Sapwood Cellars ${word[0].replace(/[\-\:\–\*].*/g, "").trim()}` }'
-  - name: Black Flag Brewing Co
-    url: https://www.blackflagbrewingco.com
-    selector: '.taplist > tbody > tr > td:first-child'
-    namefilter: !!js/function 'function(word){ return `Black Flag Brewing Company ${word}` }'
+    # Sapwood's menu app (linked from sapwoodcellars.com) with an open beers API
+    url: https://beer-discovery.vercel.app/api/beers
+    mode: json
+    listKey: beers
+    fields: [name]
+    namefilter: sapwood
   - name: Victoria Gastro Pub
+    # Untappd-for-Business embedded menu, rendered client-side
     url: https://victoriagastropub.com/draught-list/
-    selector: '.section-items-container .item-title-color > .item-info'
+    mode: browser
+    selector: '.item-info'
     beerSelector: 'span.item'
-    brewerySelector: 'span.brewery'
-  - name: Diamondback Brewing Co
-    url: https://www.diamondbackbeer.com/menu
-    selector: 'div.menu:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(2)'
-    namefilter: !!js/function 'function(word){ return `Diamondback Brewing Co ${word}` }'
-  - name: Cindy's Spirits
-    url: https://untappd.com/v/cindys-spirits/209071
-    untappd: true
-    selector: '.beer-info'
-    beerSelector: 'h5 a'
-    brewerySelector: 'h6 a'
-  - name: Snallygaster 2021
-    url: https://docs.google.com/spreadsheets/d/e/2PACX-1vQxJVhkXtcyfTjEwx1VBSB-LLAhV34EmO9ExDXyyKQxDn2HCCGiT_7K-sv1cLZwTeGmGxl6YM3F03Qw/pubhtml
-    selector: 'table > tbody > tr'
-    beerSelector: 'td + td'
-    brewerySelector: 'th + td'
+    brewerySelector: 'span.item-brewery'
+
+# Dead venues (checked 2026-07-11). Untappd venue pages only show menus for
+# venues verified with Untappd for Business; these are all unverified now.
+#   Five and Dime Ale House   https://untappd.com/v/five-and-dime-ale-house/5490279
+#   Bo Brooks Lighthouse      https://untappd.com/v/bo-brooks-lighthouse-liquors/115560
+#   Whitey's Liquors          https://untappd.com/v/whiteys-liqours/987185
+#   Perfect Pour              https://untappd.com/v/the-perfect-pour/134414
+#   Cindy's Spirits           https://untappd.com/v/cindys-spirits/209071
+# Other:
+#   Waverly Brewing Co        /on-tap/ is now a single-beer blog post
+#   Frisco's Taphouse (x2)    friscogrille.com beer pages return a database error
+#   Pratt Street Ale House    menu moved into Toast (order.toasttab.com), no HTML list
+#   Black Flag Brewing Co     site no longer publishes a taplist
+#   Diamondback Brewing Co    /menu is 404; homepage has no beer list

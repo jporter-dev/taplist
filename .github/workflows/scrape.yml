@@ -1,0 +1,23 @@
+name: Scrape taplists
+
+on:
+  schedule:
+    - cron: "17 */5 * * *"
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node scraper/index.js
+        env:
+          TAPLIST_API: https://taplist.jporter.dev
+          SCRAPER_TOKEN: ${{ secrets.SCRAPER_TOKEN }}

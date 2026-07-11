@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "taplist",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-01",
+  "kv_namespaces": [
+    {
+      "binding": "TAPLIST",
+      // Reuses the namespace from the old taplist-worker.
+      "id": "7a6f2bebdee540e58e69a01e1a72334d"
+    }
+  ],
+  "assets": {
+    "directory": "../app/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "vars": {
+    "UNTAPPD_CLIENT_ID": "BD5647598365CEB926FA9EC079E1146AE4F60140",
+    "OAUTH_REDIRECT_URL": "https://taplist.jporter.dev/"
+  }
+}
