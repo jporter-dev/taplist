@@ -18,9 +18,12 @@ One-time steps to finish the migration from Pages + taplist-worker to the single
 
 ## 3. Domain cutover
 
-- [ ] Cloudflare dashboard: remove `taplist.jporter.dev` from the old Pages project, then add it as a custom domain on the `taplist` Worker.
-- [ ] Verify the Untappd app registration's redirect URL is exactly `https://taplist.jporter.dev/` (must match the worker's `OAUTH_REDIRECT_URL` var).
+The new site lives at `taplist.prtr.dev` (declared in `worker/wrangler.jsonc` under `routes`, provisioned automatically on deploy). The old Pages site keeps `taplist.jporter.dev` until it is retired — no need to detach it first.
+
+- [ ] Deploy the worker (push to main or `cd worker && npx wrangler deploy`) and verify `https://taplist.prtr.dev/api/taplist` responds with JSON.
+- [ ] Update the Untappd app registration's redirect URL to exactly `https://taplist.prtr.dev/` (must match the worker's `OAUTH_REDIRECT_URL` var).
 - [ ] Test the OAuth round-trip on the prod domain (log in, check the feed in the right drawer).
+- [ ] Optional: keep `taplist.jporter.dev` as a redirect to the new domain once the Pages project is retired.
 
 ## 4. Retire the old infrastructure (after a stable week)
 

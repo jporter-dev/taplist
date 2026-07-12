@@ -19,5 +19,5 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: node scraper/index.js
         env:
-          TAPLIST_API: https://taplist.jporter.dev
+          TAPLIST_API: https://taplist.prtr.dev
           SCRAPER_TOKEN: ${{ secrets.SCRAPER_TOKEN }}

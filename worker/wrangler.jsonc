@@ -3,6 +3,13 @@
   "name": "taplist",
   "main": "src/index.js",
   "compatibility_date": "2026-07-01",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "taplist.prtr.dev",
+      "custom_domain": true
+    }
+  ],
   "kv_namespaces": [
     {
       "binding": "TAPLIST",
@@ -17,6 +24,6 @@
   },
   "vars": {
     "UNTAPPD_CLIENT_ID": "BD5647598365CEB926FA9EC079E1146AE4F60140",
-    "OAUTH_REDIRECT_URL": "https://taplist.jporter.dev/"
+    "OAUTH_REDIRECT_URL": "https://taplist.prtr.dev/"
   }
 }

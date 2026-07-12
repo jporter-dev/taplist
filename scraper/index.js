@@ -146,7 +146,7 @@ async function scrapeSite(site) {
 }
 
 async function postTaplist(venues) {
-  const api = process.env.TAPLIST_API ?? "https://taplist.jporter.dev";
+  const api = process.env.TAPLIST_API ?? "https://taplist.prtr.dev";
   const token = process.env.SCRAPER_TOKEN;
   if (!token) throw new Error("SCRAPER_TOKEN is not set");
   const response = await fetch(`${api}/api/taplist`, {
