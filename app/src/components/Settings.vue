@@ -1,6 +1,6 @@
 <template>
   <div>
-    <untappd-auth v-if="auth.token" class="ma-2"></untappd-auth>
+    <untappd-auth v-if="auth.token" block class="ma-2"></untappd-auth>
     <untappd-feed></untappd-feed>
     <v-divider></v-divider>
     <v-btn block variant="text" @click="showTools = !showTools">

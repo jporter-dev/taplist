@@ -1,6 +1,6 @@
 <template>
   <v-btn v-if="!auth.token" :href="loginUrl">{{ label }}</v-btn>
-  <v-btn v-else block @click="auth.logout()">Log Out</v-btn>
+  <v-btn v-else :block="block" @click="auth.logout()">Log Out</v-btn>
 </template>
 
 <script setup>
@@ -10,6 +10,7 @@ import { useAuthStore } from "../stores/auth";
 
 defineProps({
   label: { type: String, default: "Log In with Untappd" },
+  block: { type: Boolean, default: false },
 });
 
 const auth = useAuthStore();

@@ -14,10 +14,11 @@
         <img src="./assets/logo-color-64x64.png" alt="Beer" height="32" />
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn v-if="auth.user" icon @click.stop="rightDrawer = !rightDrawer">
-        <v-avatar size="34">
+      <v-btn v-if="auth.token" icon @click.stop="rightDrawer = !rightDrawer">
+        <v-avatar v-if="auth.user" size="34">
           <v-img :src="auth.user.user_avatar" alt="avatar"></v-img>
         </v-avatar>
+        <v-icon v-else>mdi-account-circle</v-icon>
       </v-btn>
       <untappd-auth v-else label="Login" class="mr-2"></untappd-auth>
     </v-app-bar>
@@ -35,7 +36,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import Venues from "./components/Venues.vue";
 import Settings from "./components/Settings.vue";
 import UntappdAuth from "./components/UntappdAuth.vue";
@@ -50,5 +51,11 @@ const auth = useAuthStore();
 onMounted(() => {
   taplist.fetchTaplist();
   if (auth.token && !auth.user) auth.fetchUser();
+});
+
+// The profile fetch can fail (e.g. Untappd's hourly rate limit); retry
+// when the drawer opens so the avatar recovers without a reload.
+watch(rightDrawer, (open) => {
+  if (open && auth.token && !auth.user) auth.fetchUser();
 });
 </script>
