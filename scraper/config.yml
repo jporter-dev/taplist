@@ -16,9 +16,7 @@
 sites:
   - name: Wet City
     url: https://wetcitybrewing.com/
-    # The page is the whole menu (incl. cocktails, wine, and food); every
-    # section is an article titled by an h1. Beer sections as of 2026-07:
-    # Hoppy Beer, Sours & Hard Seltzers, Lager-ish Beer, Misc, Guest Beer.
+    # The page mixes beer sections with cocktails, wine, and food.
     section:
       selector: 'article.default-menu'
       header: 'h1.entry-title'
@@ -40,7 +38,7 @@ sites:
   - name: The Ale House Columbia
     url: https://untappd.com/v/the-ale-house-columbia/498845
     mode: browser
-    # Menu also has Bottle/Can Beer and Beer Flights sections.
+    # Skips the Bottle/Can Beer and Beer Flights sections.
     section:
       selector: '.menu-section'
       header: '.menu-section-header'
@@ -50,9 +48,8 @@ sites:
     brewerySelector: 'h6 a'
     namefilter: stripLeadingNumbers
   - name: Sapwood Cellars
-    # Sapwood's menu app (linked from sapwoodcellars.com) with an open beers
-    # API. The style field doubles as the menu group; without the filter we'd
-    # also get In House Bottles/Cans and Wines & Cocktails.
+    # Sapwood's menu app API. style doubles as the menu group; unfiltered
+    # it also returns bottles, cans, and wines & cocktails.
     url: https://beer-discovery.vercel.app/api/beers
     mode: json
     listKey: beers
@@ -60,8 +57,7 @@ sites:
     fields: [name]
     namefilter: sapwood
   - name: Victoria Gastro Pub
-    # Untappd-for-Business embedded menu, rendered client-side. The page has
-    # two tabs: DRAFT LIST and Can & Bottle Selection.
+    # Untappd-for-Business embed. Skips the Can & Bottle Selection tab.
     url: https://victoriagastropub.com/draught-list/
     mode: browser
     section:

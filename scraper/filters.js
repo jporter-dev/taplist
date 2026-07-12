@@ -1,6 +1,5 @@
-// Name filters referenced by name from config.yml (`namefilter: <name>`).
-// Each takes a raw scraped beer string and returns the cleaned name, or a
-// falsy value to drop the entry.
+// Referenced from config.yml via `namefilter`. Return the cleaned name,
+// or falsy to drop the entry.
 
 export const wetCity = (word) => {
   word = word.replace(/Full Pour.*|\d+oz.*|\$.*/, "").trim();

@@ -8,7 +8,7 @@
 Browser (Vue 3 SPA) ──same-origin──> Cloudflare Worker "taplist"
                                       ├─ serves static assets (app/dist, SPA fallback)
                                       ├─ GET  /api/taplist        (KV aggregate, edge-cached 5 min)
-                                      ├─ POST /api/taplist        (Bearer SCRAPER_TOKEN — scraper only)
+                                      ├─ POST /api/taplist        (Bearer SCRAPER_TOKEN, scraper only)
                                       ├─ POST /api/auth/untappd   (OAuth code exchange; secret server-side)
                                       └─ GET  /api/beer?q=...     (KV-cached Untappd lookup, 7-day TTL)
 GitHub Actions cron (~5h)  ──> scraper (Playwright + cheerio) ──authed POST──> /api/taplist
@@ -17,9 +17,9 @@ GitHub Actions push→main   ──> build app + wrangler deploy
 
 Monorepo with npm workspaces:
 
-- **`app/`** — Vue 3 + Vuetify 3 + Vite + Pinia frontend
-- **`worker/`** — Cloudflare Worker (API + static assets + KV)
-- **`scraper/`** — venue scraper (`config.yml`-driven; fetch/cheerio, Playwright, or JSON API per venue)
+- **`app/`**: Vue 3 + Vuetify 3 + Vite + Pinia frontend
+- **`worker/`**: Cloudflare Worker (API + static assets + KV)
+- **`scraper/`**: venue scraper (`config.yml`-driven; fetch/cheerio, Playwright, or JSON API per venue)
 
 ## Development
 
@@ -62,8 +62,8 @@ Required worker secrets (`wrangler secret put`): `SCRAPER_TOKEN`, `UNTAPPD_CLIEN
 
 Venues live in `scraper/config.yml`. Each entry needs a `name`, `url`, and one of:
 
-- `mode: fetch` (default) — static HTML, scraped with cheerio using `selector` (plus optional `beerSelector`/`brewerySelector` sub-selectors)
-- `mode: browser` — JS-rendered pages, scraped with Playwright using the same selector fields
-- `mode: json` — a JSON API; `listKey` is the dot-path to the array, `fields` are joined with spaces to form the beer name
+- `mode: fetch` (default): static HTML, scraped with cheerio using `selector` (plus optional `beerSelector`/`brewerySelector` sub-selectors)
+- `mode: browser`: JS-rendered pages, scraped with Playwright using the same selector fields
+- `mode: json`: a JSON API; `listKey` is the dot-path to the array, `fields` are joined with spaces to form the beer name
 
 Optional `namefilter` references a named export from `scraper/filters.js` to clean up scraped names. Dead venues are documented at the bottom of the config.

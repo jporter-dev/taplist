@@ -1,8 +1,7 @@
 import { useAuthStore } from "../stores/auth";
 
-// Untappd beer lookups, cached in localStorage. Logged-in users query
-// Untappd directly with their own token (includes auth_rating); logged-out
-// users go through the worker's shared, KV-cached /api/beer endpoint.
+// Logged-in users query Untappd directly (their token includes auth_rating);
+// logged-out users share the worker's KV-cached /api/beer endpoint.
 export function useBeerDetails() {
   const auth = useAuthStore();
 
@@ -41,20 +40,19 @@ export function useBeerDetails() {
     return beer;
   }
 
-  // Untappd allows 100 requests/hour per user and reports errors in the
-  // JSON meta envelope, so decode that instead of trusting fetch alone.
+  // Untappd reports errors in a JSON meta envelope, not the HTTP status.
   async function untappdGet(url) {
     let response;
     try {
       response = await fetch(url);
     } catch {
-      throw new Error("Couldn't reach Untappd — check your connection.");
+      throw new Error("Couldn't reach Untappd. Check your connection.");
     }
     const json = await response.json().catch(() => null);
     const code = json?.meta?.code ?? response.status;
     if (code === 429) {
       const error = new Error(
-        "Untappd hourly API limit reached — ratings will load again after the top of the hour."
+        "Untappd hourly API limit reached. Ratings will load again after the top of the hour."
       );
       error.rateLimited = true;
       throw error;

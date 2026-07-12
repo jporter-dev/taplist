@@ -24,8 +24,7 @@ const loginUrl =
   `&response_type=code&redirect_url=${encodeURIComponent(redirectUrl)}`;
 
 onMounted(async () => {
-  // The app bar mounts before the router resolves the initial navigation,
-  // so route.query is empty until the router is ready.
+  // route.query is empty until the router resolves the initial navigation.
   await router.isReady();
   if (!auth.token && route.query.code) {
     try {

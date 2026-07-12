@@ -257,10 +257,8 @@ watch(expanded, (ids) => {
   }
 });
 
-// On a venue page, logged-in users get ratings prefetched for the whole
-// venue. Sequentially: Untappd allows only 100 requests/hour per user
-// (2 per beer), so a parallel burst both trips the limit and leaves
-// nothing for the rest of the hour. Stop at the first rate-limit error.
+// Prefetch sequentially: Untappd allows 100 requests/hour per user
+// (2 per beer), so a parallel burst would drain the whole budget.
 watch(
   [venueFilter, () => store.loading],
   async ([venue, loading]) => {

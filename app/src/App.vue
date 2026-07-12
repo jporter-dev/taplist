@@ -53,8 +53,7 @@ onMounted(() => {
   if (auth.token && !auth.user) auth.fetchUser();
 });
 
-// The profile fetch can fail (e.g. Untappd's hourly rate limit); retry
-// when the drawer opens so the avatar recovers without a reload.
+// Retry on drawer open so the avatar recovers from a rate-limited fetch.
 watch(rightDrawer, (open) => {
   if (open && auth.token && !auth.user) auth.fetchUser();
 });

@@ -62,8 +62,7 @@ async function postTaplist(request, env, ctx) {
     return json({ error: "Body must contain a venues object" }, 400);
   }
 
-  // Merge with the existing list so venues that failed to scrape this run
-  // keep their last-known-good beers.
+  // Merge so venues that failed this scrape keep their last-known-good beers.
   const existing = JSON.parse((await env.TAPLIST.get(TAPLIST_KEY)) ?? "{}");
   const merged = {
     updated_at: Date.now(),
@@ -132,8 +131,7 @@ async function getBeer(url, env) {
   const b = info?.response?.beer;
   if (!b) return json({ error: "Beer not found" }, 404);
 
-  // Trimmed to the fields the frontend renders; auth_rating only exists for
-  // user-token lookups, which the frontend does directly.
+  // Only the fields the frontend renders; auth_rating requires a user token.
   const beer = {
     bid: b.bid,
     beer_name: b.beer_name,
