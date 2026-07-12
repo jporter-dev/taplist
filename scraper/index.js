@@ -48,7 +48,17 @@ async function getBrowser() {
 }
 
 function extractWithCheerio($, site) {
-  return $(site.selector)
+  let scope = $.root();
+  if (site.section) {
+    const re = new RegExp(site.section.match, "i");
+    const roots = $(site.section.selector)
+      .toArray()
+      .filter((el) => re.test($(el).find(site.section.header).first().text()));
+    if (roots.length === 0) throw new Error("no menu sections matched");
+    scope = $(roots);
+  }
+  return scope
+    .find(site.selector)
     .toArray()
     .map((el) => {
       if (site.beerSelector && site.brewerySelector) {
@@ -69,10 +79,15 @@ async function scrapeJson(site) {
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = await response.json();
-  const list = site.listKey
+  let list = site.listKey
     .split(".")
     .reduce((obj, key) => obj?.[key], data);
   if (!Array.isArray(list)) throw new Error(`listKey "${site.listKey}" is not an array`);
+  if (site.where) {
+    list = list.filter((item) =>
+      Object.entries(site.where).every(([field, value]) => item[field] === value)
+    );
+  }
   return list.map((item) =>
     site.fields.map((f) => `${item[f] ?? ""}`.trim()).filter(Boolean).join(" ")
   );
@@ -99,7 +114,16 @@ async function scrapeBrowser(site) {
     });
     await page.waitForSelector(site.selector, { timeout: BROWSER_TIMEOUT_MS });
     return await page.evaluate((s) => {
-      return Array.from(document.querySelectorAll(s.selector))
+      let scopes = [document];
+      if (s.section) {
+        const re = new RegExp(s.section.match, "i");
+        scopes = Array.from(document.querySelectorAll(s.section.selector)).filter(
+          (el) => re.test(el.querySelector(s.section.header)?.innerText ?? "")
+        );
+        if (scopes.length === 0) throw new Error("no menu sections matched");
+      }
+      return scopes
+        .flatMap((scope) => Array.from(scope.querySelectorAll(s.selector)))
         .map((el) => {
           if (s.beerSelector && s.brewerySelector) {
             const brewery = el.querySelector(s.brewerySelector);

@@ -3,6 +3,17 @@
     <v-card-title class="d-flex align-center">
       <h3 class="hidden-sm-and-down">
         {{ venueFilter ?? "Local Taplist" }}
+        <v-btn
+          v-if="venueUrl"
+          :href="venueUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          icon="mdi-open-in-new"
+          size="x-small"
+          variant="text"
+          title="Open the venue's taplist"
+          class="ml-1"
+        ></v-btn>
       </h3>
       <v-spacer class="hidden-sm-and-down"></v-spacer>
       <v-text-field
@@ -136,10 +147,11 @@
                     <v-btn
                       variant="tonal"
                       size="small"
-                      icon="mdi-refresh"
-                      title="Reload rating"
+                      prepend-icon="mdi-refresh"
                       @click="loadDetails(item, true)"
-                    ></v-btn>
+                    >
+                      Reload
+                    </v-btn>
                   </div>
                 </div>
               </div>
@@ -176,6 +188,10 @@ const details = reactive({});
 
 const venueFilter = computed(() =>
   route.params.name ? decodeURIComponent(route.params.name) : null
+);
+
+const venueUrl = computed(() =>
+  venueFilter.value ? store.data?.venues?.[venueFilter.value]?.url : null
 );
 
 const items = computed(() =>

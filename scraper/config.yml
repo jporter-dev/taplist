@@ -9,10 +9,20 @@
 #   brewerySelector  optional sub-selector for the brewery; output is "<brewery> <beer>"
 #   listKey          json mode: dot-path to the array in the response
 #   fields           json mode: item fields joined with spaces to form the name
+#   where            json mode: {field: value} pairs an item must match exactly
+#   section          fetch/browser modes: restrict scraping to menu sections whose
+#                    header matches; {selector, header, match (case-insens regex)}
 #   namefilter       optional named function exported from filters.js
 sites:
   - name: Wet City
     url: https://wetcitybrewing.com/
+    # The page is the whole menu (incl. cocktails, wine, and food); every
+    # section is an article titled by an h1. Beer sections as of 2026-07:
+    # Hoppy Beer, Sours & Hard Seltzers, Lager-ish Beer, Misc, Guest Beer.
+    section:
+      selector: 'article.default-menu'
+      header: 'h1.entry-title'
+      match: 'beer|sours|lager|misc'
     selector: '.items .item .item-header h4.name'
     namefilter: wetCity
   - name: "Max's Taphouse"
@@ -30,21 +40,34 @@ sites:
   - name: The Ale House Columbia
     url: https://untappd.com/v/the-ale-house-columbia/498845
     mode: browser
+    # Menu also has Bottle/Can Beer and Beer Flights sections.
+    section:
+      selector: '.menu-section'
+      header: '.menu-section-header'
+      match: 'draft'
     selector: '.beer-info'
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
     namefilter: stripLeadingNumbers
   - name: Sapwood Cellars
-    # Sapwood's menu app (linked from sapwoodcellars.com) with an open beers API
+    # Sapwood's menu app (linked from sapwoodcellars.com) with an open beers
+    # API. The style field doubles as the menu group; without the filter we'd
+    # also get In House Bottles/Cans and Wines & Cocktails.
     url: https://beer-discovery.vercel.app/api/beers
     mode: json
     listKey: beers
+    where: { style: Draft Beer }
     fields: [name]
     namefilter: sapwood
   - name: Victoria Gastro Pub
-    # Untappd-for-Business embedded menu, rendered client-side
+    # Untappd-for-Business embedded menu, rendered client-side. The page has
+    # two tabs: DRAFT LIST and Can & Bottle Selection.
     url: https://victoriagastropub.com/draught-list/
     mode: browser
+    section:
+      selector: '.tab-content'
+      header: 'h2'
+      match: 'draft'
     selector: '.item-info'
     beerSelector: 'span.item'
     brewerySelector: 'span.item-brewery'
