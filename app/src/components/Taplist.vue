@@ -54,85 +54,96 @@
       <template #expanded-row="{ columns, item }">
         <tr>
           <td :colspan="columns.length" class="pa-0">
-            <v-card flat color="grey-darken-4">
-              <v-card-text>
-                <v-row v-if="details[item.id]?.beer?.beer_description" justify="center">
-                  <v-col cols="12" md="6" class="my-2">
-                    <h3 class="mb-2">Description</h3>
-                    {{ details[item.id].beer.beer_description }}
-                  </v-col>
-                </v-row>
-                <v-row justify="center">
-                  <v-col v-if="auth.token" cols="6" md="3">
-                    <h3>
-                      Your Rating
-                      <span
-                        class="text-caption"
-                        v-if="details[item.id]?.beer?.stats"
-                      >
-                        ({{
-                          details[item.id].beer.stats.user_count === 0
-                            ? "N/A"
-                            : details[item.id].beer.auth_rating
-                        }})
+            <div class="beer-details d-flex ga-4 pa-4 bg-grey-darken-4">
+              <v-avatar
+                v-if="beerFor(item)?.beer_label"
+                :image="beerFor(item).beer_label"
+                size="72"
+                rounded="lg"
+                class="flex-shrink-0 d-none d-sm-flex"
+              ></v-avatar>
+              <div class="flex-grow-1" style="min-width: 0">
+                <v-progress-linear
+                  v-if="details[item.id]?.loading"
+                  indeterminate
+                  color="amber"
+                  class="mb-2"
+                ></v-progress-linear>
+                <div
+                  v-if="beerMeta(item).length"
+                  class="text-body-2 text-grey-lighten-1 mb-2"
+                >
+                  {{ beerMeta(item).join(" · ") }}
+                </div>
+                <p
+                  v-if="beerFor(item)?.beer_description"
+                  class="beer-description text-body-2 text-grey-lighten-2 mb-3"
+                >
+                  {{ beerFor(item).beer_description }}
+                </p>
+                <div
+                  v-if="details[item.id]?.error"
+                  class="text-body-2 text-red-lighten-3 mb-2"
+                >
+                  {{ details[item.id].error }}
+                </div>
+                <div class="d-flex flex-wrap align-center ga-4">
+                  <div v-if="auth.token && beerFor(item)">
+                    <div class="text-caption text-grey">Your rating</div>
+                    <div class="d-flex align-center">
+                      <v-rating
+                        :model-value="beerFor(item).auth_rating ?? 0"
+                        color="yellow-darken-3"
+                        density="compact"
+                        size="x-small"
+                        readonly
+                        half-increments
+                      ></v-rating>
+                      <span class="text-caption text-grey-lighten-2 ml-2">
+                        {{ formatRating(beerFor(item).auth_rating) }}
                       </span>
-                    </h3>
-                    <v-rating
-                      v-if="details[item.id]?.beer"
-                      :model-value="details[item.id].beer.auth_rating"
-                      color="yellow-darken-3"
-                      size="small"
-                      readonly
-                      half-increments
-                    ></v-rating>
-                  </v-col>
-                  <v-col cols="6" md="3">
-                    <h3>
-                      Global Rating
-                      <span class="text-caption" v-if="details[item.id]?.beer">
-                        ({{ details[item.id].beer.rating_score }})
+                    </div>
+                  </div>
+                  <div v-if="beerFor(item)">
+                    <div class="text-caption text-grey">Global rating</div>
+                    <div class="d-flex align-center">
+                      <v-rating
+                        :model-value="beerFor(item).rating_score"
+                        color="yellow-darken-3"
+                        density="compact"
+                        size="x-small"
+                        readonly
+                        half-increments
+                      ></v-rating>
+                      <span class="text-caption text-grey-lighten-2 ml-2">
+                        {{ formatRating(beerFor(item).rating_score) }}
                       </span>
-                    </h3>
-                    <v-rating
-                      v-if="details[item.id]?.beer"
-                      :model-value="details[item.id].beer.rating_score"
-                      color="yellow-darken-3"
-                      size="small"
-                      readonly
-                      half-increments
-                    ></v-rating>
-                    <span class="text-red-lighten-3">
-                      {{ details[item.id]?.error }}
-                    </span>
-                  </v-col>
-                </v-row>
-                <v-row justify="center">
-                  <v-col cols="6" md="3">
-                    <h3>Style</h3>
-                    <p v-if="details[item.id]?.beer">
-                      {{ details[item.id].beer.beer_style }}
-                    </p>
-                    <h3 class="mt-2">Location</h3>
-                    <p>{{ item.location }}</p>
-                  </v-col>
-                  <v-col cols="6" md="3">
+                    </div>
+                  </div>
+                  <v-spacer></v-spacer>
+                  <div class="d-flex ga-2">
                     <v-btn
                       :href="untappdURL(item)"
                       target="_blank"
                       rel="noopener noreferrer"
                       color="primary"
-                      block
-                      class="mb-2"
+                      variant="tonal"
+                      size="small"
+                      prepend-icon="mdi-open-in-new"
                     >
-                      View on Untappd
+                      Untappd
                     </v-btn>
-                    <v-btn block color="secondary" @click="loadDetails(item, true)">
-                      Reload Rating
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
+                    <v-btn
+                      variant="tonal"
+                      size="small"
+                      icon="mdi-refresh"
+                      title="Reload rating"
+                      @click="loadDetails(item, true)"
+                    ></v-btn>
+                  </div>
+                </div>
+              </div>
+            </div>
           </td>
         </tr>
       </template>
@@ -177,6 +188,24 @@ function ratingFor(item) {
   return details[item.id]?.beer?.rating_score ?? null;
 }
 
+function beerFor(item) {
+  return details[item.id]?.beer ?? null;
+}
+
+function beerMeta(item) {
+  const beer = beerFor(item);
+  return [
+    beer?.beer_style,
+    beer?.beer_abv ? `${beer.beer_abv}% ABV` : null,
+    beer?.brewery?.brewery_name,
+    item.location,
+  ].filter(Boolean);
+}
+
+function formatRating(value) {
+  return value ? Number(value).toFixed(2) : "N/A";
+}
+
 function untappdURL(item) {
   const bid = details[item.id]?.beer?.bid;
   if (bid && navigator.userAgent.toLowerCase().match(/mobile/i))
@@ -191,6 +220,7 @@ async function loadDetails(item, reload = false) {
     details[item.id].beer = await getBeer(item.name, { reload });
   } catch (error) {
     details[item.id].error = error.message;
+    details[item.id].rateLimited = error.rateLimited ?? false;
   } finally {
     details[item.id].loading = false;
   }
@@ -212,12 +242,16 @@ watch(expanded, (ids) => {
 });
 
 // On a venue page, logged-in users get ratings prefetched for the whole
-// venue (their own token + localStorage cache absorb the cost).
+// venue. Sequentially: Untappd allows only 100 requests/hour per user
+// (2 per beer), so a parallel burst both trips the limit and leaves
+// nothing for the rest of the hour. Stop at the first rate-limit error.
 watch(
   [venueFilter, () => store.loading],
-  ([venue, loading]) => {
-    if (venue && !loading && auth.token) {
-      for (const item of items.value) loadDetails(item);
+  async ([venue, loading]) => {
+    if (!venue || loading || !auth.token) return;
+    for (const item of items.value) {
+      await loadDetails(item);
+      if (details[item.id]?.rateLimited) break;
     }
   },
   { immediate: true }
@@ -227,5 +261,8 @@ watch(
 <style>
 .v-data-table tbody tr {
   cursor: pointer;
+}
+.beer-description {
+  max-width: 65ch;
 }
 </style>

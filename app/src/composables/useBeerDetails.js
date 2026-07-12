@@ -28,17 +28,41 @@ export function useBeerDetails() {
   }
 
   async function fetchWithToken(name) {
-    const search = await fetch(
+    const search = await untappdGet(
       `https://api.untappd.com/v4/search/beer?q=${encodeURIComponent(name)}&access_token=${auth.token}`
-    ).then((r) => r.json());
+    );
     const bid = search?.response?.beers?.items?.[0]?.beer?.bid;
     if (!bid) throw new Error("Unable to find beer on Untappd.");
-    const info = await fetch(
+    const info = await untappdGet(
       `https://api.untappd.com/v4/beer/info/${bid}?access_token=${auth.token}`
-    ).then((r) => r.json());
+    );
     const beer = info?.response?.beer;
     if (!beer) throw new Error("Unable to load beer from Untappd.");
     return beer;
+  }
+
+  // Untappd allows 100 requests/hour per user and reports errors in the
+  // JSON meta envelope, so decode that instead of trusting fetch alone.
+  async function untappdGet(url) {
+    let response;
+    try {
+      response = await fetch(url);
+    } catch {
+      throw new Error("Couldn't reach Untappd — check your connection.");
+    }
+    const json = await response.json().catch(() => null);
+    const code = json?.meta?.code ?? response.status;
+    if (code === 429) {
+      const error = new Error(
+        "Untappd hourly API limit reached — ratings will load again after the top of the hour."
+      );
+      error.rateLimited = true;
+      throw error;
+    }
+    if (!json || code !== 200) {
+      throw new Error(json?.meta?.error_detail || `Untappd error (HTTP ${code}).`);
+    }
+    return json;
   }
 
   async function fetchAnon(name) {
