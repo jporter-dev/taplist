@@ -56,6 +56,29 @@ sites:
     where: { style: Draft Beer }
     fields: [name]
     namefilter: sapwood
+  - name: Reckless Shepherd Brewing Co
+    # Took over the old Frisco's Taphouse spot in Columbia.
+    url: https://untappd.com/v/reckless-shepherd-brewing-co/7236083
+    mode: browser
+    section:
+      selector: '.menu-section'
+      header: '.menu-section-header'
+      match: 'draft'
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: stripLeadingNumbers
+  - name: Black Flag Brewing Co
+    url: https://untappd.com/v/black-flag-brewing-co/5115855
+    mode: browser
+    section:
+      selector: '.menu-section'
+      header: '.menu-section-header'
+      match: 'taproom'
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: stripLeadingNumbers
   - name: Victoria Gastro Pub
     # Untappd-for-Business embed. Skips the Can & Bottle Selection tab.
     url: https://victoriagastropub.com/draught-list/
@@ -68,16 +91,19 @@ sites:
     beerSelector: 'span.item'
     brewerySelector: 'span.item-brewery'
 
-# Dead venues (checked 2026-07-11). Untappd venue pages only show menus for
-# venues verified with Untappd for Business; these are all unverified now.
-#   Five and Dime Ale House   https://untappd.com/v/five-and-dime-ale-house/5490279
-#   Bo Brooks Lighthouse      https://untappd.com/v/bo-brooks-lighthouse-liquors/115560
-#   Whitey's Liquors          https://untappd.com/v/whiteys-liqours/987185
-#   Perfect Pour              https://untappd.com/v/the-perfect-pour/134414
-#   Cindy's Spirits           https://untappd.com/v/cindys-spirits/209071
-# Other:
-#   Waverly Brewing Co        /on-tap/ is now a single-beer blog post
-#   Frisco's Taphouse (x2)    friscogrille.com beer pages return a database error
-#   Pratt Street Ale House    menu moved into Toast (order.toasttab.com), no HTML list
-#   Black Flag Brewing Co     site no longer publishes a taplist
-#   Diamondback Brewing Co    /menu is 404; homepage has no beer list
+# Dead venues (rechecked 2026-07-12). Untappd only renders menus for venues
+# verified with Untappd for Business.
+#   Five and Dime Ale House   closed
+#   Lighthouse Canton         ex Bo Brooks / Lighthouse Liquors; runs 12 draft
+#                             lines but publishes no list (lhcanton.com Draft
+#                             shop category is empty, BeerMenus is login-gated,
+#                             res-menu.net blocks bots)
+#   Whitey's Liquors          https://untappd.com/v/whitey-s-liquors/987185 live
+#                             but no published menu
+#   The Perfect Pour          untappd venue verified but no published menu
+#   Sandy's Spirits           ex Cindy's Spirits; https://untappd.com/v/sandy-s-spirits/11563102
+#                             live but no published menu
+#   Waverly Brewing Co        taplist only posted on Instagram
+#   Pratt Street Ale House    menu lives in Toast; menus API returns 401 without
+#                             auth and the page uses recaptcha
+#   Diamondback Brewing Co    8-12 rotating taps but no list on site or untappd
