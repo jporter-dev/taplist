@@ -79,6 +79,62 @@ sites:
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
     namefilter: stripLeadingNumbers
+  - name: Checkerspot Brewing Co
+    url: https://untappd.com/v/checkerspot-brewing-company/12232758
+    mode: browser
+    # Beer sections only; the menu also has Wine, Cocktails, and Non Alcoholic.
+    section:
+      selector: '.menu-section'
+      header: '.menu-section-header'
+      match: 'lighter|malt|hop'
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: stripLeadingNumbers
+  - name: Peabody Heights Brewery
+    url: https://untappd.com/v/peabody-heights-brewery/647899
+    mode: browser
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: stripLeadingNumbers
+  - name: Heavy Seas Beer
+    url: https://untappd.com/v/heavy-seas-beer/6664
+    mode: browser
+    # Skips the Flights, Bottle/Can Pours, and Non-Alcoholic sections.
+    section:
+      selector: '.menu-section'
+      header: '.menu-section-header'
+      match: 'draft'
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: stripLeadingNumbers
+  - name: Guilford Hall Brewery
+    url: https://untappd.com/v/guilford-hall-brewery/10604610
+    mode: browser
+    section:
+      selector: '.menu-section'
+      header: '.menu-section-header'
+      match: 'bier'
+    selector: '.beer-info'
+    beerSelector: 'h5 a'
+    brewerySelector: 'h6 a'
+    namefilter: stripLeadingNumbers
+  - name: Crooked Crab Brewing
+    # Untappd-for-Business embed (one-col theme). Skips the Can Pour and
+    # Township Meadery sections. The embed shows no brewery per item, so
+    # .item-brewery never matches and the namefilter adds the prefix.
+    url: https://www.crookedcrabbrewing.com/on-tap-now.html
+    mode: browser
+    section:
+      selector: '.section'
+      header: 'h3, h4'
+      match: 'on tap'
+    selector: '.menu-item'
+    beerSelector: '.item-name a'
+    brewerySelector: '.item-brewery'
+    namefilter: crookedCrab
   - name: Victoria Gastro Pub
     # Untappd-for-Business embed. Skips the Can & Bottle Selection tab.
     url: https://victoriagastropub.com/draught-list/
