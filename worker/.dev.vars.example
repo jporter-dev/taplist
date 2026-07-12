@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local development (wrangler dev reads it automatically).
+# Production values are set with `wrangler secret put <NAME>`.
+SCRAPER_TOKEN=dev-token
+UNTAPPD_CLIENT_SECRET=your-untappd-client-secret

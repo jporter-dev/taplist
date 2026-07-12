@@ -1,58 +1,21 @@
 {
   "name": "taplist",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "app",
+    "worker",
+    "scraper"
+  ],
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "scrape": "node scraper/scraper.js",
-    "deploy": "npm run scrape && npm run build",
-    "proxy": "lcp --proxyUrl https://untappd.com"
-  },
-  "dependencies": {
-    "@bugsnag/js": "^6.2.0",
-    "@bugsnag/plugin-vue": "^6.2.0",
-    "algoliasearch": "^3.32.1",
-    "axios": "^0.18.0",
-    "dotenv": "^6.2.0",
-    "is-wsl": "^1.1.0",
-    "js-cookie": "^2.2.0",
-    "js-yaml": "^3.13.1",
-    "node-fetch": "^3.0.0",
-    "puppeteer": "^1.15.0",
-    "register-service-worker": "^1.5.2",
-    "vue": "^2.6.10",
-    "vue-router": "^3.0.6",
-    "vuetify": "^1.5.13",
-    "vuex": "^3.0.1",
-    "vuex-persistedstate": "^2.5.4"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.7.0",
-    "@vue/cli-plugin-eslint": "^3.7.0",
-    "@vue/cli-plugin-pwa": "^3.7.0",
-    "@vue/cli-service": "^3.7.0",
-    "@vue/eslint-config-prettier": "^4.0.1",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "lint-staged": "^8.1.5",
-    "node-sass": "^4.12.0",
-    "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.6.10"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
+    "dev:app": "npm run dev -w app",
+    "dev:worker": "npm run dev -w worker",
+    "build": "npm run build -w app",
+    "deploy": "npm run build -w app && npm run deploy -w worker",
+    "scrape": "node scraper/index.js",
+    "scrape:dry": "node scraper/index.js --dry-run"
   }
 }

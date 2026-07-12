@@ -1,0 +1,16 @@
+{
+  "name": "@taplist/scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "node index.js",
+    "scrape:dry": "node index.js --dry-run"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.0",
+    "js-yaml": "^4.1.0",
+    "p-limit": "^6.2.0",
+    "playwright": "^1.54.0"
+  }
+}
