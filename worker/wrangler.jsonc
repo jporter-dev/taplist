@@ -22,6 +22,21 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
+  "ratelimits": [
+    {
+      // Per-IP limit on /api/beer so one client can't drain the shared
+      // Untappd hourly quota. The authed scraper bypasses it.
+      "name": "BEER_RATELIMIT",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
   "vars": {
     "UNTAPPD_CLIENT_ID": "BD5647598365CEB926FA9EC079E1146AE4F60140",
     "OAUTH_REDIRECT_URL": "https://taplist.prtr.dev/"

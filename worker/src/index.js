@@ -2,6 +2,7 @@ const JSON_HEADERS = { "Content-Type": "application/json" };
 const TAPLIST_KEY = "taplist";
 const TAPLIST_CACHE_SECONDS = 300;
 const BEER_CACHE_SECONDS = 604800; // 7 days
+const BEER_NEGATIVE_CACHE_SECONDS = 86400; // 1 day; unfindable beers stop burning quota
 
 export default {
   async fetch(request, env, ctx) {
@@ -19,7 +20,7 @@ export default {
     }
 
     if (pathname === "/api/beer" && request.method === "GET") {
-      return getBeer(url, env);
+      return getBeer(request, url, env);
     }
 
     if (pathname.startsWith("/api/")) {
@@ -48,7 +49,7 @@ async function getTaplist(request, env, ctx) {
 }
 
 async function postTaplist(request, env, ctx) {
-  if (!isAuthorized(request, env)) {
+  if (!(await isAuthorized(request, env))) {
     return json({ error: "Unauthorized" }, 401);
   }
 
@@ -64,6 +65,7 @@ async function postTaplist(request, env, ctx) {
 
   // Merge so venues that failed this scrape keep their last-known-good beers.
   const existing = JSON.parse((await env.TAPLIST.get(TAPLIST_KEY)) ?? "{}");
+  stampFirstSeen(body.venues, existing.venues ?? {});
   const merged = {
     updated_at: Date.now(),
     venues: { ...existing.venues, ...body.venues },
@@ -72,6 +74,20 @@ async function postTaplist(request, env, ctx) {
 
   ctx.waitUntil(caches.default.delete(taplistCacheKey(request)));
   return json({ ok: true, venues: Object.keys(body.venues).length });
+}
+
+// Powers the "new on tap" badge. null means unknown: the beer predates
+// tracking, or the whole venue is new (badging an entire venue is noise).
+function stampFirstSeen(incoming, existing) {
+  const now = Date.now();
+  for (const [name, venue] of Object.entries(incoming)) {
+    const priorVenue = existing[name];
+    const prior = new Map((priorVenue?.beers ?? []).map((b) => [b.id, b]));
+    for (const beer of venue.beers ?? []) {
+      const old = prior.get(beer.id);
+      beer.first_seen = !priorVenue ? null : old ? (old.first_seen ?? null) : now;
+    }
+  }
 }
 
 async function exchangeOauthCode(request, env) {
@@ -102,16 +118,25 @@ async function exchangeOauthCode(request, env) {
   return json({ access_token: token });
 }
 
-async function getBeer(url, env) {
+async function getBeer(request, url, env) {
   const q = url.searchParams.get("q")?.trim();
   if (!q) return json({ error: "Missing q parameter" }, 400);
 
+  // The scraper (authed) enriches whole venues in one run; only browsers
+  // share the per-IP budget. Protects the app-wide Untappd hourly quota.
+  if (!(await isAuthorized(request, env))) {
+    const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    const { success } = await env.BEER_RATELIMIT.limit({ key: ip });
+    if (!success) return json({ error: "Too many requests" }, 429);
+  }
+
   const kvKey = `beer:${slugify(q)}`;
-  const cached = await env.TAPLIST.get(kvKey);
+  const cached = await env.TAPLIST.get(kvKey, "json");
   if (cached) {
-    return new Response(cached, {
-      headers: { ...JSON_HEADERS, "X-Cache": "hit" },
-    });
+    if (cached.not_found) {
+      return json({ error: "Beer not found" }, 404, { "X-Cache": "hit" });
+    }
+    return json(cached, 200, { "X-Cache": "hit" });
   }
 
   const creds = `client_id=${env.UNTAPPD_CLIENT_ID}&client_secret=${env.UNTAPPD_CLIENT_SECRET}`;
@@ -120,8 +145,8 @@ async function getBeer(url, env) {
   );
   if (!searchResp.ok) return json({ error: "Untappd search failed" }, 502);
   const search = await searchResp.json();
-  const bid = search?.response?.beers?.items?.[0]?.beer?.bid;
-  if (!bid) return json({ error: "Beer not found" }, 404);
+  const bid = bestMatch(search?.response?.beers?.items, q)?.beer?.bid;
+  if (!bid) return notFound(env, kvKey);
 
   const infoResp = await fetch(
     `https://api.untappd.com/v4/beer/info/${bid}?${creds}`
@@ -129,7 +154,7 @@ async function getBeer(url, env) {
   if (!infoResp.ok) return json({ error: "Untappd beer info failed" }, 502);
   const info = await infoResp.json();
   const b = info?.response?.beer;
-  if (!b) return json({ error: "Beer not found" }, 404);
+  if (!b) return notFound(env, kvKey);
 
   // Only the fields the frontend renders; auth_rating requires a user token.
   const beer = {
@@ -149,14 +174,38 @@ async function getBeer(url, env) {
   await env.TAPLIST.put(kvKey, JSON.stringify(beer), {
     expirationTtl: BEER_CACHE_SECONDS,
   });
-  return new Response(JSON.stringify(beer), {
-    headers: { ...JSON_HEADERS, "X-Cache": "miss" },
-  });
+  return json(beer, 200, { "X-Cache": "miss" });
 }
 
-function isAuthorized(request, env) {
+// Scraped names are "<brewery> <beer>", but Untappd's first hit is sometimes
+// another brewery's beer with a similar name. Prefer a hit whose brewery
+// actually appears in the query.
+function bestMatch(items, q) {
+  if (!Array.isArray(items) || items.length === 0) return null;
+  const query = q.toLowerCase();
+  const match = items.find((item) => {
+    const brewery = item.brewery?.brewery_name?.toLowerCase();
+    return brewery && query.includes(brewery);
+  });
+  return match ?? items[0];
+}
+
+async function notFound(env, kvKey) {
+  await env.TAPLIST.put(kvKey, JSON.stringify({ not_found: true }), {
+    expirationTtl: BEER_NEGATIVE_CACHE_SECONDS,
+  });
+  return json({ error: "Beer not found" }, 404, { "X-Cache": "miss" });
+}
+
+async function isAuthorized(request, env) {
   const header = request.headers.get("Authorization") ?? "";
-  return env.SCRAPER_TOKEN && header === `Bearer ${env.SCRAPER_TOKEN}`;
+  const expected = `Bearer ${env.SCRAPER_TOKEN}`;
+  if (!env.SCRAPER_TOKEN) return false;
+  const enc = new TextEncoder();
+  const a = enc.encode(header);
+  const b = enc.encode(expected);
+  if (a.byteLength !== b.byteLength) return false;
+  return crypto.subtle.timingSafeEqual(a, b);
 }
 
 function taplistCacheKey(request) {
@@ -171,6 +220,9 @@ function slugify(name) {
     .replace(/^-+|-+$/g, "");
 }
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
+function json(data, status = 200, headers = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...JSON_HEADERS, ...headers },
+  });
 }
