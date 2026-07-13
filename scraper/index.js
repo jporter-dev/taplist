@@ -2,12 +2,15 @@
 // Scrapes venue taplists defined in config.yml and POSTs them to the worker.
 //
 // Usage:
-//   node scraper/index.js                 scrape all venues and POST
-//   node scraper/index.js --dry-run       scrape and print JSON, no POST
+//   node scraper/index.js                 scrape all venues, enrich, and POST
+//   node scraper/index.js --dry-run       scrape and print JSON, no enrich/POST
 //   node scraper/index.js --site "Name"   scrape a single venue
 //   node scraper/index.js --out file.json also write the result to a file
 //
-// Env: TAPLIST_API (default https://taplist.jporter.dev), SCRAPER_TOKEN
+// Full runs enrich each beer with Untappd data (rating, style, ABV) via the
+// worker's /api/beer endpoint before POSTing; dry runs stay offline.
+//
+// Env: TAPLIST_API (default https://taplist.prtr.dev), SCRAPER_TOKEN
 
 import fs from "node:fs";
 import path from "node:path";
@@ -24,6 +27,12 @@ const USER_AGENT =
 const FETCH_TIMEOUT_MS = 30000;
 const BROWSER_TIMEOUT_MS = 45000;
 const CONCURRENCY = 4;
+const DEFAULT_API = "https://taplist.prtr.dev";
+// Untappd allows ~100 calls/hour and each cache miss costs 2 (search + info).
+// Beers over budget stay unenriched and get picked up on a later run.
+const ENRICH_MISS_BUDGET = 40;
+// ~5 consecutive failed scrapes at the 5h cron cadence. Selector rot, not a blip.
+const STALE_ALERT_HOURS = 24;
 
 const { values: args } = parseArgs({
   options: {
@@ -178,8 +187,81 @@ async function scrapeSite(site) {
   return { url: site.url, last_updated: Date.now(), beers };
 }
 
+async function enrichVenues(venues) {
+  const api = process.env.TAPLIST_API ?? DEFAULT_API;
+  const token = process.env.SCRAPER_TOKEN;
+  let hits = 0;
+  let misses = 0;
+  let unmatched = 0;
+  let skipped = 0;
+  for (const venue of Object.values(venues)) {
+    for (const beer of venue.beers) {
+      if (misses >= ENRICH_MISS_BUDGET) {
+        skipped++;
+        continue;
+      }
+      try {
+        const response = await fetch(
+          `${api}/api/beer?q=${encodeURIComponent(beer.name)}`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+          }
+        );
+        if (response.headers.get("X-Cache") === "miss") misses++;
+        else hits++;
+        if (response.status === 404) {
+          unmatched++;
+          continue;
+        }
+        if (!response.ok) {
+          skipped++;
+          continue;
+        }
+        const b = await response.json();
+        beer.untappd = {
+          bid: b.bid,
+          rating: b.rating_score,
+          checkins: b.stats?.user_count ?? 0,
+          style: b.beer_style,
+          abv: b.beer_abv,
+          label: b.beer_label,
+          brewery: b.brewery?.brewery_name,
+        };
+      } catch {
+        skipped++;
+      }
+    }
+  }
+  console.log(
+    `Enriched: ${hits} cached, ${misses} looked up, ${unmatched} unmatched, ${skipped} skipped`
+  );
+}
+
+// Venues whose stored data is old failed several scrapes in a row.
+async function findStaleVenues(siteNames) {
+  const api = process.env.TAPLIST_API ?? DEFAULT_API;
+  const response = await fetch(`${api}/api/taplist`, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  if (!response.ok) return [];
+  const data = await response.json();
+  const cutoff = Date.now() - STALE_ALERT_HOURS * 60 * 60 * 1000;
+  return siteNames.filter((name) => {
+    const venue = data.venues?.[name];
+    return venue && venue.last_updated < cutoff;
+  });
+}
+
+// Surfaces failures in the Actions run page without digging through logs.
+function writeStepSummary(lines) {
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (!file || lines.length === 0) return;
+  fs.appendFileSync(file, lines.join("\n") + "\n");
+}
+
 async function postTaplist(venues) {
-  const api = process.env.TAPLIST_API ?? "https://taplist.prtr.dev";
+  const api = process.env.TAPLIST_API ?? DEFAULT_API;
   const token = process.env.SCRAPER_TOKEN;
   if (!token) throw new Error("SCRAPER_TOKEN is not set");
   const response = await fetch(`${api}/api/taplist`, {
@@ -232,10 +314,16 @@ async function main() {
   if (failures.length > 0) {
     console.error(`\n${failures.length} venue(s) failed:`);
     for (const failure of failures) console.error(`  ${failure}`);
+    writeStepSummary([
+      "### Scrape failures",
+      ...failures.map((f) => `- ${f}`),
+    ]);
   }
   const succeeded = Object.keys(venues).length;
   console.log(`\n${succeeded}/${sites.length} venues scraped.`);
   if (succeeded === 0) process.exit(1);
+
+  if (!args["dry-run"]) await enrichVenues(venues);
 
   const output = JSON.stringify({ venues }, null, 2);
   if (args.out) fs.writeFileSync(args.out, output);
@@ -245,6 +333,21 @@ async function main() {
   }
   await postTaplist(venues);
   console.log("Posted to worker.");
+
+  // Fail the run (after posting) when a venue has missed several scrapes,
+  // so selector rot shows up as a red Action instead of silently old data.
+  if (!args.site) {
+    const stale = await findStaleVenues(sites.map((s) => s.name));
+    if (stale.length > 0) {
+      console.error(`\nStale venues (no update in ${STALE_ALERT_HOURS}h):`);
+      for (const name of stale) console.error(`  ${name}`);
+      writeStepSummary([
+        `### Stale venues (no update in ${STALE_ALERT_HOURS}h)`,
+        ...stale.map((name) => `- ${name}`),
+      ]);
+      process.exitCode = 1;
+    }
+  }
 }
 
 await main();
