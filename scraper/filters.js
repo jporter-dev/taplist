@@ -11,6 +11,8 @@ export const union = (word) => `Union ${word}`;
 
 export const crookedCrab = (word) => `Crooked Crab ${word}`;
 
+export const ministry = (word) => `Ministry of Brewing ${word}`;
+
 export const stripLeadingNumbers = (word) => word.replace(/\d{1,2}\. /g, "");
 
 export const sapwood = (word) => {

@@ -135,6 +135,15 @@ sites:
     beerSelector: '.item-name a'
     brewerySelector: '.item-brewery'
     namefilter: crookedCrab
+  - name: Ministry of Brewing
+    # Their site's own GraphQL API; id and token are static constants from
+    # the public JS bundle. taproomList marks what is pouring now.
+    url: https://api.ministryofbrewing.com/graphql?query=%7BallBeers%28id%3A%22109JF0SA9DUFJ0J3%22%2C%20token%3A%22DIFJAOSDIJFOSDIJFI%22%29%7Bname%20taproomList%7D%7D
+    mode: json
+    listKey: data.allBeers
+    where: { taproomList: true }
+    fields: [name]
+    namefilter: ministry
   - name: Victoria Gastro Pub
     # Untappd-for-Business embed. Skips the Can & Bottle Selection tab.
     url: https://victoriagastropub.com/draught-list/
@@ -163,3 +172,10 @@ sites:
 #   Pratt Street Ale House    menu lives in Toast; menus API returns 401 without
 #                             auth and the page uses recaptcha
 #   Diamondback Brewing Co    8-12 rotating taps but no list on site or untappd
+#
+# Considered and rejected (2026-07-12):
+#   Guinness Open Gate        site is behind an age gate with recaptcha; menu
+#                             lives in Toast (auth-walled API)
+#   Monument City Brewing     no published menu on site or untappd
+#   Mobtown, Baltimore Taphouse, Brewer's Art
+#                             no published menus found
