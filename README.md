@@ -10,10 +10,18 @@ Browser (Vue 3 SPA) ──same-origin──> Cloudflare Worker "taplist"
                                       ├─ GET  /api/taplist        (KV aggregate, edge-cached 5 min)
                                       ├─ POST /api/taplist        (Bearer SCRAPER_TOKEN, scraper only)
                                       ├─ POST /api/auth/untappd   (OAuth code exchange; secret server-side)
-                                      └─ GET  /api/beer?q=...     (KV-cached Untappd lookup, 7-day TTL)
-GitHub Actions cron (~5h)  ──> scraper (Playwright + cheerio) ──authed POST──> /api/taplist
+                                      └─ GET  /api/beer?q=...     (KV-cached Untappd lookup, 7-day TTL,
+                                                                   negative-cached 1 day, per-IP rate limited)
+GitHub Actions cron (~5h)  ──> scraper (Playwright + cheerio)
+                                ├─ enriches beers via /api/beer (rating, style, ABV, bid)
+                                └─ authed POST ──> /api/taplist (worker merges, stamps first_seen)
 GitHub Actions push→main   ──> build app + wrangler deploy
 ```
+
+Beers arrive pre-enriched with Untappd data, so the table sorts by rating and
+filters by style without client-side lookups. The worker stamps `first_seen`
+on beers new to a venue (the "new on tap" badge); logged-in users get their
+Untappd wishlist matched against the taplist using their own API quota.
 
 Monorepo with npm workspaces:
 
@@ -53,7 +61,7 @@ npm run build && npm run dev:worker   # then open http://localhost:8787
 ## Deployment
 
 - **Push to `main`** → `.github/workflows/deploy.yml` builds the app and runs `wrangler deploy`.
-- **Every ~5 hours** → `.github/workflows/scrape.yml` scrapes all venues and POSTs to the worker. Venues that fail to scrape keep their last-known-good beers (the worker merges).
+- **Every ~5 hours** → `.github/workflows/scrape.yml` scrapes all venues, enriches them, and POSTs to the worker. Venues that fail to scrape keep their last-known-good beers (the worker merges). Failures land in the Actions step summary, and the run goes red when any venue has had no successful scrape in 24h (selector rot).
 
 Required GitHub repo secrets: `SCRAPER_TOKEN`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 Required worker secrets (`wrangler secret put`): `SCRAPER_TOKEN`, `UNTAPPD_CLIENT_SECRET`.
