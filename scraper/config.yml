@@ -122,8 +122,7 @@ sites:
     brewerySelector: 'h6 a'
     namefilter: stripLeadingNumbers
   - name: Crooked Crab Brewing
-    # Untappd-for-Business embed (one-col theme). Skips the Can Pour and
-    # Township Meadery sections. The embed shows no brewery per item, so
+    # Untappd-for-Business embed. Brewery is not shown per item, so
     # .item-brewery never matches and the namefilter adds the prefix.
     url: https://www.crookedcrabbrewing.com/on-tap-now.html
     mode: browser
