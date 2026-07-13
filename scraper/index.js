@@ -153,7 +153,11 @@ function normalize(rawBeers, site) {
   const seen = new Set();
   const beers = [];
   for (let name of rawBeers) {
-    name = name.replace(/\s+/g, " ").trim();
+    // Menus use asterisks as footnote markers (happy hour, to-go, etc).
+    name = name
+      .replace(/\s+/g, " ")
+      .replace(/^\*+\s*|\s*\*+$/g, "")
+      .trim();
     if (namefilter) name = namefilter(name);
     if (!name || seen.has(name)) continue;
     seen.add(name);

@@ -20,7 +20,9 @@ export const nepenthe = (word) => {
   if (!word) return null;
   if (/^(on tap|malt|hops|notes|additions|the brew|contains|yeast)\b/i.test(word)) return null;
   if (word.includes("&") || /beers$/i.test(word)) return null;
-  return `Nepenthe ${word}`;
+  // The site sets names in all caps.
+  const titled = word.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase());
+  return `Nepenthe ${titled}`;
 };
 
 export const stripLeadingNumbers = (word) => word.replace(/\d{1,2}\. /g, "");
