@@ -33,6 +33,7 @@
       :loading="store.loading"
       :items-per-page="25"
       :items-per-page-options="[25, 50, 100]"
+      :sort-by="[{ key: 'name', order: 'asc' }]"
       item-value="id"
       show-expand
       v-model:expanded="expanded"
@@ -194,11 +195,20 @@ const venueUrl = computed(() =>
   venueFilter.value ? store.data?.venues?.[venueFilter.value]?.url : null
 );
 
-const items = computed(() =>
-  venueFilter.value
-    ? store.beers.filter((b) => b.location === venueFilter.value)
-    : store.beers
-);
+// The index dedupes beers pouring at several venues into one row and
+// lists every venue in location; venue pages keep per-venue rows.
+const items = computed(() => {
+  if (venueFilter.value) {
+    return store.beers.filter((b) => b.location === venueFilter.value);
+  }
+  const byName = new Map();
+  for (const beer of store.beers) {
+    const existing = byName.get(beer.name);
+    if (existing) existing.location += `, ${beer.location}`;
+    else byName.set(beer.name, { ...beer });
+  }
+  return [...byName.values()];
+});
 
 function ratingFor(item) {
   return details[item.id]?.beer?.rating_score ?? null;

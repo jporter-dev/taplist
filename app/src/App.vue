@@ -10,7 +10,7 @@
     <v-app-bar color="primary">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-spacer></v-spacer>
-      <v-btn icon to="/">
+      <v-btn icon to="/" :active="false">
         <img src="./assets/logo-color-64x64.png" alt="Beer" height="32" />
       </v-btn>
       <v-spacer></v-spacer>
