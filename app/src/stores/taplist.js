@@ -30,6 +30,12 @@ export const useTaplistStore = defineStore("taplist", {
       if (!this.lastUpdatedTs) return false;
       return Date.now() - this.lastUpdatedTs > STALE_HOURS * 60 * 60 * 1000;
     },
+    isVenueStale(state) {
+      return (name) => {
+        const ts = state.data?.venues?.[name]?.last_updated;
+        return !!ts && Date.now() - ts > STALE_HOURS * 60 * 60 * 1000;
+      };
+    },
   },
   actions: {
     async fetchTaplist() {

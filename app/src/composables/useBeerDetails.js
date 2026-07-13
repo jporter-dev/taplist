@@ -1,5 +1,8 @@
 import { useAuthStore } from "../stores/auth";
 
+// Matches the worker's KV TTL so client ratings don't drift older than that.
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 // Logged-in users query Untappd directly (their token includes auth_rating);
 // logged-out users share the worker's KV-cached /api/beer endpoint.
 export function useBeerDetails() {
@@ -10,8 +13,9 @@ export function useBeerDetails() {
   async function getBeer(name, { reload = false } = {}) {
     if (!reload) {
       try {
-        const cached = localStorage.getItem(cacheKey(name));
-        if (cached) return JSON.parse(cached);
+        const entry = JSON.parse(localStorage.getItem(cacheKey(name)));
+        // Entries without a timestamp predate expiry and get refetched.
+        if (entry?.t && Date.now() - entry.t < CACHE_TTL_MS) return entry.beer;
       } catch {
         // ignore unreadable cache entries
       }
@@ -19,7 +23,10 @@ export function useBeerDetails() {
 
     const beer = auth.token ? await fetchWithToken(name) : await fetchAnon(name);
     try {
-      localStorage.setItem(cacheKey(name), JSON.stringify(beer));
+      localStorage.setItem(
+        cacheKey(name),
+        JSON.stringify({ t: Date.now(), beer })
+      );
     } catch {
       // localStorage full or unavailable; caching is best-effort
     }
@@ -30,7 +37,16 @@ export function useBeerDetails() {
     const search = await untappdGet(
       `https://api.untappd.com/v4/search/beer?q=${encodeURIComponent(name)}&access_token=${auth.token}`
     );
-    const bid = search?.response?.beers?.items?.[0]?.beer?.bid;
+    const items = search?.response?.beers?.items ?? [];
+    // Scraped names are "<brewery> <beer>"; prefer a hit whose brewery
+    // appears in the query over Untappd's sometimes-wrong first result.
+    const query = name.toLowerCase();
+    const match =
+      items.find((item) => {
+        const brewery = item.brewery?.brewery_name?.toLowerCase();
+        return brewery && query.includes(brewery);
+      }) ?? items[0];
+    const bid = match?.beer?.bid;
     if (!bid) throw new Error("Unable to find beer on Untappd.");
     const info = await untappdGet(
       `https://api.untappd.com/v4/beer/info/${bid}?access_token=${auth.token}`
