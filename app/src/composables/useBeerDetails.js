@@ -51,11 +51,9 @@ export function useBeerDetails() {
     const json = await response.json().catch(() => null);
     const code = json?.meta?.code ?? response.status;
     if (code === 429) {
-      const error = new Error(
+      throw new Error(
         "Untappd hourly API limit reached. Ratings will load again after the top of the hour."
       );
-      error.rateLimited = true;
-      throw error;
     }
     if (!json || code !== 200) {
       throw new Error(json?.meta?.error_detail || `Untappd error (HTTP ${code}).`);

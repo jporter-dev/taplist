@@ -236,7 +236,6 @@ async function loadDetails(item, reload = false) {
     details[item.id].beer = await getBeer(item.name, { reload });
   } catch (error) {
     details[item.id].error = error.message;
-    details[item.id].rateLimited = error.rateLimited ?? false;
   } finally {
     details[item.id].loading = false;
   }
@@ -256,20 +255,6 @@ watch(expanded, (ids) => {
     if (item) loadDetails(item);
   }
 });
-
-// Prefetch sequentially: Untappd allows 100 requests/hour per user
-// (2 per beer), so a parallel burst would drain the whole budget.
-watch(
-  [venueFilter, () => store.loading],
-  async ([venue, loading]) => {
-    if (!venue || loading || !auth.token) return;
-    for (const item of items.value) {
-      await loadDetails(item);
-      if (details[item.id]?.rateLimited) break;
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <style>
