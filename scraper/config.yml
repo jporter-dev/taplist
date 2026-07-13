@@ -12,6 +12,8 @@
 #   where            json mode: {field: value} pairs an item must match exactly
 #   section          fetch/browser modes: restrict scraping to menu sections whose
 #                    header matches; {selector, header, match (case-insens regex)}
+#   stopAt           drop this entry and everything after it (case-insens regex),
+#                    for pages where sections share one container
 #   namefilter       optional named function exported from filters.js
 sites:
   - name: Wet City
@@ -91,6 +93,15 @@ sites:
     beerSelector: 'h5 a'
     brewerySelector: 'h6 a'
     namefilter: stripLeadingNumbers
+  - name: Nepenthe Brewing Co
+    # One Wix rich-text block holds the whole menu. Beer names are the
+    # green spans; h4 rows carry section headers and descriptions and ride
+    # along so stopAt can cut at the cans list. The namefilter drops them.
+    url: https://www.nepenthebrewingco.com/on-tap
+    mode: browser
+    selector: 'p.font_7 span[style*="5EB981"], h4.font_4'
+    stopAt: 'cans to go'
+    namefilter: nepenthe
   - name: Peabody Heights Brewery
     url: https://untappd.com/v/peabody-heights-brewery/647899
     mode: browser

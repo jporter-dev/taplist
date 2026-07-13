@@ -145,6 +145,11 @@ function normalize(rawBeers, site) {
   if (site.namefilter && !namefilter) {
     throw new Error(`Unknown namefilter "${site.namefilter}"`);
   }
+  if (site.stopAt) {
+    const re = new RegExp(site.stopAt, "i");
+    const stop = rawBeers.findIndex((name) => re.test(name));
+    if (stop >= 0) rawBeers = rawBeers.slice(0, stop);
+  }
   const seen = new Set();
   const beers = [];
   for (let name of rawBeers) {
