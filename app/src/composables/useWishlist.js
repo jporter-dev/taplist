@@ -81,5 +81,44 @@ export function useWishlist() {
     }
   }
 
-  return { bids, loading, refresh };
+  // Returns the new state (true = on the wishlist).
+  async function toggle(bid) {
+    if (!auth.token || !bid) return undefined;
+    const on = bids.value.has(bid);
+    const action = on ? "delete" : "add";
+    let json;
+    try {
+      const response = await fetch(
+        `https://api.untappd.com/v4/user/wishlist/${action}?access_token=${auth.token}&bid=${bid}`
+      );
+      json = await response.json().catch(() => null);
+    } catch {
+      throw new Error("Couldn't reach Untappd. Check your connection.");
+    }
+    if (json?.meta?.code !== 200) {
+      throw new Error(
+        json?.meta?.error_detail || "Untappd wishlist update failed."
+      );
+    }
+    const next = new Set(bids.value);
+    if (on) next.delete(bid);
+    else next.add(bid);
+    bids.value = next;
+    // Sync an existing cache entry without extending its TTL; a partial
+    // fetch has no entry and stays uncached.
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+      if (cached?.t) {
+        localStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({ t: cached.t, bids: [...next] })
+        );
+      }
+    } catch {
+      // caching is best-effort
+    }
+    return !on;
+  }
+
+  return { bids, loading, refresh, toggle };
 }

@@ -186,6 +186,25 @@
                   <v-spacer></v-spacer>
                   <div class="d-flex ga-2">
                     <v-btn
+                      v-if="auth.token && bidFor(item)"
+                      variant="tonal"
+                      size="small"
+                      :color="
+                        wishlistBids.has(bidFor(item))
+                          ? 'red-lighten-1'
+                          : undefined
+                      "
+                      :prepend-icon="
+                        wishlistBids.has(bidFor(item))
+                          ? 'mdi-heart'
+                          : 'mdi-heart-outline'
+                      "
+                      :loading="wishlistBusy === bidFor(item)"
+                      @click="toggleWishlist(item)"
+                    >
+                      Wishlist
+                    </v-btn>
+                    <v-btn
                       :href="untappdURL(item)"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -231,7 +250,10 @@ const auth = useAuthStore();
 const route = useRoute();
 const { mdAndUp } = useDisplay();
 const { getBeer } = useBeerDetails();
-const { bids: wishlistBids } = useWishlist();
+const {
+  bids: wishlistBids,
+  toggle: toggleWishlistBid,
+} = useWishlist();
 
 const headers = computed(() => {
   const rating = {
@@ -332,6 +354,25 @@ function beerFor(item) {
   return details[item.id]?.beer ?? null;
 }
 
+function bidFor(item) {
+  return details[item.id]?.beer?.bid ?? item.untappd?.bid ?? null;
+}
+
+const wishlistBusy = ref(null);
+
+async function toggleWishlist(item) {
+  const bid = bidFor(item);
+  wishlistBusy.value = bid;
+  try {
+    await toggleWishlistBid(bid);
+    if (details[item.id]) details[item.id].error = null;
+  } catch (error) {
+    if (details[item.id]) details[item.id].error = error.message;
+  } finally {
+    wishlistBusy.value = null;
+  }
+}
+
 function beerMeta(item) {
   const beer = beerFor(item);
   return [
@@ -347,7 +388,7 @@ function formatRating(value) {
 }
 
 function untappdURL(item) {
-  const bid = details[item.id]?.beer?.bid ?? item.untappd?.bid;
+  const bid = bidFor(item);
   if (bid && navigator.userAgent.toLowerCase().match(/mobile/i))
     return `untappd://beer/${bid}`;
   return `https://untappd.com/search?q=${encodeURIComponent(item.name)}`;
