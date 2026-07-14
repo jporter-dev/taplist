@@ -259,7 +259,7 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
 import { useTaplistStore } from "../stores/taplist";
 import { useAuthStore } from "../stores/auth";
@@ -271,6 +271,7 @@ const NEW_WINDOW_MS = 48 * 60 * 60 * 1000;
 const store = useTaplistStore();
 const auth = useAuthStore();
 const route = useRoute();
+const router = useRouter();
 const { mdAndUp } = useDisplay();
 const { getBeer } = useBeerDetails();
 const {
@@ -303,9 +304,43 @@ function nullsLast(a, b) {
 const expanded = ref([]);
 // item.id -> { loading, beer, error }
 const details = reactive({});
-const styleFilter = ref([]);
-const wishlistOnly = ref(false);
-const newOnly = ref(false);
+
+// Filters live in the URL (?styles=IPA,Stout&new=1&wishlist=1) so they
+// reset when navigating to a venue and survive back/forward.
+function stylesFromQuery(q) {
+  return typeof q.styles === "string" && q.styles ? q.styles.split(",") : [];
+}
+
+const styleFilter = ref(stylesFromQuery(route.query));
+const wishlistOnly = ref(route.query.wishlist === "1");
+const newOnly = ref(route.query.new === "1");
+
+watch([styleFilter, wishlistOnly, newOnly], ([styles, wishlist, isNew]) => {
+  const query = { ...route.query };
+  delete query.styles;
+  delete query.wishlist;
+  delete query.new;
+  if (styles.length > 0) query.styles = styles.join(",");
+  if (wishlist) query.wishlist = "1";
+  if (isNew) query.new = "1";
+  router.replace({ query });
+});
+
+watch(
+  () => route.query,
+  (q) => {
+    const styles = stylesFromQuery(q);
+    if (styles.join(",") !== styleFilter.value.join(",")) {
+      styleFilter.value = styles;
+    }
+    if ((q.wishlist === "1") !== wishlistOnly.value) {
+      wishlistOnly.value = q.wishlist === "1";
+    }
+    if ((q.new === "1") !== newOnly.value) {
+      newOnly.value = q.new === "1";
+    }
+  }
+);
 
 const venueFilter = computed(() =>
   route.params.name ? decodeURIComponent(route.params.name) : null
