@@ -194,9 +194,17 @@ async function enrichVenues(venues) {
   let misses = 0;
   let unmatched = 0;
   let skipped = 0;
+  let authed = null;
+  const errors = {}; // status or error name -> count
   for (const venue of Object.values(venues)) {
     for (const beer of venue.beers) {
       if (misses >= ENRICH_MISS_BUDGET) {
+        skipped++;
+        continue;
+      }
+      // A stream of 429s means the worker is treating us as anonymous;
+      // looping through hundreds more beers won't recover within the run.
+      if ((errors[429] ?? 0) >= 10) {
         skipped++;
         continue;
       }
@@ -208,6 +216,7 @@ async function enrichVenues(venues) {
             signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
           }
         );
+        authed ??= response.headers.get("X-Authed");
         if (response.headers.get("X-Cache") === "miss") misses++;
         else hits++;
         if (response.status === 404) {
@@ -215,6 +224,7 @@ async function enrichVenues(venues) {
           continue;
         }
         if (!response.ok) {
+          errors[response.status] = (errors[response.status] ?? 0) + 1;
           skipped++;
           continue;
         }
@@ -228,14 +238,25 @@ async function enrichVenues(venues) {
           label: b.beer_label,
           brewery: b.brewery?.brewery_name,
         };
-      } catch {
+      } catch (error) {
+        errors[error.name ?? "error"] = (errors[error.name ?? "error"] ?? 0) + 1;
         skipped++;
       }
     }
   }
-  console.log(
-    `Enriched: ${hits} cached, ${misses} looked up, ${unmatched} unmatched, ${skipped} skipped`
-  );
+  const errorNote = Object.entries(errors)
+    .map(([k, v]) => `${k}x${v}`)
+    .join(" ");
+  const summary =
+    `Enriched: ${hits} cached, ${misses} looked up, ${unmatched} unmatched, ` +
+    `${skipped} skipped (authed=${authed}${errorNote ? `, errors: ${errorNote}` : ""})`;
+  console.log(summary);
+  writeStepSummary([`### Enrichment`, summary]);
+  if (token && authed === "false") {
+    console.error(
+      "SCRAPER_TOKEN was sent but the worker rejected it; enrichment ran rate-limited."
+    );
+  }
 }
 
 // Venues whose stored data is old failed several scrapes in a row.
