@@ -29,15 +29,6 @@
           {{ venue.name }}
         </v-list-item-title>
         <template #append>
-          <v-chip
-            v-if="venue.avgRating"
-            size="small"
-            prepend-icon="mdi-star"
-            class="mr-1"
-            title="Average Untappd rating"
-          >
-            {{ venue.avgRating }}
-          </v-chip>
           <v-chip size="small">{{ venue.count }}</v-chip>
         </template>
       </v-list-item>
@@ -58,27 +49,14 @@ const props = defineProps({
 const store = useTaplistStore();
 
 const venues = computed(() => {
-  const stats = {};
+  const counts = {};
   for (const beer of store.beers) {
     const fav = !!store.favorites[beer.location];
     if (props.favs !== fav) continue;
-    const entry = (stats[beer.location] ??= {
-      name: beer.location,
-      count: 0,
-      ratingSum: 0,
-      rated: 0,
-    });
-    entry.count++;
-    if (beer.untappd?.rating) {
-      entry.ratingSum += beer.untappd.rating;
-      entry.rated++;
-    }
+    counts[beer.location] = (counts[beer.location] ?? 0) + 1;
   }
-  return Object.values(stats)
-    .map((entry) => ({
-      ...entry,
-      avgRating: entry.rated ? (entry.ratingSum / entry.rated).toFixed(1) : null,
-    }))
+  return Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
     .sort((a, b) => a.name.localeCompare(b.name));
 });
 </script>
