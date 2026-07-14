@@ -124,37 +124,44 @@ async function getBeer(request, url, env) {
 
   // The scraper (authed) enriches whole venues in one run; only browsers
   // share the per-IP budget. Protects the app-wide Untappd hourly quota.
-  if (!(await isAuthorized(request, env))) {
+  const authed = await isAuthorized(request, env);
+  // X-Authed lets the scraper detect a token mismatch from response headers.
+  const diag = { "X-Authed": String(authed) };
+  if (!authed) {
     const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
     const { success } = await env.BEER_RATELIMIT.limit({ key: ip });
-    if (!success) return json({ error: "Too many requests" }, 429);
+    if (!success) return json({ error: "Too many requests" }, 429, diag);
   }
 
   const kvKey = `beer:${slugify(q)}`;
   const cached = await env.TAPLIST.get(kvKey, "json");
   if (cached) {
     if (cached.not_found) {
-      return json({ error: "Beer not found" }, 404, { "X-Cache": "hit" });
+      return json({ error: "Beer not found" }, 404, { ...diag, "X-Cache": "hit" });
     }
-    return json(cached, 200, { "X-Cache": "hit" });
+    return json(cached, 200, { ...diag, "X-Cache": "hit" });
   }
 
   const creds = `client_id=${env.UNTAPPD_CLIENT_ID}&client_secret=${env.UNTAPPD_CLIENT_SECRET}`;
   const searchResp = await fetch(
     `https://api.untappd.com/v4/search/beer?q=${encodeURIComponent(q)}&${creds}`
   );
-  if (!searchResp.ok) return json({ error: "Untappd search failed" }, 502);
+  if (!searchResp.ok) {
+    return json({ error: `Untappd search failed (${searchResp.status})` }, 502, diag);
+  }
   const search = await searchResp.json();
   const bid = bestMatch(search?.response?.beers?.items, q)?.beer?.bid;
-  if (!bid) return notFound(env, kvKey);
+  if (!bid) return notFound(env, kvKey, diag);
 
   const infoResp = await fetch(
     `https://api.untappd.com/v4/beer/info/${bid}?${creds}`
   );
-  if (!infoResp.ok) return json({ error: "Untappd beer info failed" }, 502);
+  if (!infoResp.ok) {
+    return json({ error: `Untappd beer info failed (${infoResp.status})` }, 502, diag);
+  }
   const info = await infoResp.json();
   const b = info?.response?.beer;
-  if (!b) return notFound(env, kvKey);
+  if (!b) return notFound(env, kvKey, diag);
 
   // Only the fields the frontend renders; auth_rating requires a user token.
   const beer = {
@@ -174,7 +181,7 @@ async function getBeer(request, url, env) {
   await env.TAPLIST.put(kvKey, JSON.stringify(beer), {
     expirationTtl: BEER_CACHE_SECONDS,
   });
-  return json(beer, 200, { "X-Cache": "miss" });
+  return json(beer, 200, { ...diag, "X-Cache": "miss" });
 }
 
 // Scraped names are "<brewery> <beer>", but Untappd's first hit is sometimes
@@ -190,11 +197,11 @@ function bestMatch(items, q) {
   return match ?? items[0];
 }
 
-async function notFound(env, kvKey) {
+async function notFound(env, kvKey, diag = {}) {
   await env.TAPLIST.put(kvKey, JSON.stringify({ not_found: true }), {
     expirationTtl: BEER_NEGATIVE_CACHE_SECONDS,
   });
-  return json({ error: "Beer not found" }, 404, { "X-Cache": "miss" });
+  return json({ error: "Beer not found" }, 404, { ...diag, "X-Cache": "miss" });
 }
 
 async function isAuthorized(request, env) {
