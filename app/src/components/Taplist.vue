@@ -149,6 +149,18 @@
                 >
                   {{ beerMeta(item).join(" · ") }}
                 </div>
+                <div class="d-flex flex-wrap ga-1 mb-2">
+                  <v-chip
+                    v-for="loc in item.locations"
+                    :key="loc"
+                    :to="`/venue/${encodeURIComponent(loc)}`"
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-map-marker"
+                  >
+                    {{ loc }}
+                  </v-chip>
+                </div>
                 <p
                   v-if="beerFor(item)?.beer_description"
                   class="beer-description text-body-2 text-grey-lighten-2 mb-3"
@@ -315,13 +327,15 @@ const baseItems = computed(() => {
   for (const beer of store.beers) {
     const existing = byName.get(beer.name);
     if (existing) {
+      // location stays a string so table search still matches venue names.
       existing.location += `, ${beer.location}`;
+      existing.locations.push(beer.location);
       // Only new if its first appearance anywhere is recent.
       existing.first_seen =
         existing.first_seen && beer.first_seen
           ? Math.min(existing.first_seen, beer.first_seen)
           : null;
-    } else byName.set(beer.name, { ...beer });
+    } else byName.set(beer.name, { ...beer, locations: [beer.location] });
   }
   return [...byName.values()].map(decorate);
 });
@@ -337,6 +351,7 @@ function decorate(beer) {
     style: untappd?.style ?? null,
     styleGroup: untappd?.style?.split(" -")[0] ?? null,
     abv: untappd?.abv ?? null,
+    locations: beer.locations ?? [beer.location],
     isNew: !!beer.first_seen && Date.now() - beer.first_seen < NEW_WINDOW_MS,
     wishlisted:
       (!!bid && wishlistBids.value.has(bid)) ||
@@ -400,7 +415,6 @@ function beerMeta(item) {
     beer?.beer_style ?? item.style,
     beer?.beer_abv ? `${beer.beer_abv}% ABV` : null,
     beer?.brewery?.brewery_name,
-    item.location,
   ].filter(Boolean);
 }
 
