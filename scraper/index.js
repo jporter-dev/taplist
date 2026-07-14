@@ -202,9 +202,10 @@ async function enrichVenues(venues) {
         skipped++;
         continue;
       }
-      // A stream of 429s means the worker is treating us as anonymous;
-      // looping through hundreds more beers won't recover within the run.
-      if ((errors[429] ?? 0) >= 10) {
+      // A stream of 429s (worker treating us as anonymous) or 502s
+      // (Untappd hourly quota gone) won't recover within the run;
+      // stop hammering and let the next run continue.
+      if ((errors[429] ?? 0) >= 10 || (errors[502] ?? 0) >= 10) {
         skipped++;
         continue;
       }
