@@ -39,6 +39,17 @@
         </v-chip>
       </v-chip-group>
       <v-chip
+        v-if="hasNew"
+        size="small"
+        variant="tonal"
+        prepend-icon="mdi-star-shooting"
+        :color="newOnly ? 'green' : undefined"
+        class="flex-shrink-0 mr-2"
+        @click="newOnly = !newOnly"
+      >
+        New
+      </v-chip>
+      <v-chip
         v-if="auth.token && wishlistBids.size > 0"
         size="small"
         variant="tonal"
@@ -252,6 +263,7 @@ const { mdAndUp } = useDisplay();
 const { getBeer } = useBeerDetails();
 const {
   bids: wishlistBids,
+  names: wishlistNames,
   toggle: toggleWishlistBid,
 } = useWishlist();
 
@@ -281,6 +293,7 @@ const expanded = ref([]);
 const details = reactive({});
 const styleFilter = ref([]);
 const wishlistOnly = ref(false);
+const newOnly = ref(false);
 
 const venueFilter = computed(() =>
   route.params.name ? decodeURIComponent(route.params.name) : null
@@ -315,6 +328,9 @@ const baseItems = computed(() => {
 
 function decorate(beer) {
   const untappd = beer.untappd;
+  // The bid may come from scrape-time enrichment or an expanded-row fetch;
+  // name matching covers wishlist beers that have neither yet.
+  const bid = details[beer.id]?.beer?.bid ?? untappd?.bid ?? null;
   return {
     ...beer,
     rating: untappd?.rating ?? null,
@@ -322,7 +338,9 @@ function decorate(beer) {
     styleGroup: untappd?.style?.split(" -")[0] ?? null,
     abv: untappd?.abv ?? null,
     isNew: !!beer.first_seen && Date.now() - beer.first_seen < NEW_WINDOW_MS,
-    wishlisted: !!untappd?.bid && wishlistBids.value.has(untappd.bid),
+    wishlisted:
+      (!!bid && wishlistBids.value.has(bid)) ||
+      wishlistNames.value.has(beer.name.toLowerCase()),
   };
 }
 
@@ -337,12 +355,15 @@ const styleGroups = computed(() => {
   );
 });
 
+const hasNew = computed(() => baseItems.value.some((b) => b.isNew));
+
 const items = computed(() => {
   let list = baseItems.value;
   if (styleFilter.value.length > 0) {
     list = list.filter((b) => styleFilter.value.includes(b.styleGroup));
   }
   if (wishlistOnly.value) list = list.filter((b) => b.wishlisted);
+  if (newOnly.value) list = list.filter((b) => b.isNew);
   return list;
 });
 
@@ -364,7 +385,7 @@ async function toggleWishlist(item) {
   const bid = bidFor(item);
   wishlistBusy.value = bid;
   try {
-    await toggleWishlistBid(bid);
+    await toggleWishlistBid(bid, item.name);
     if (details[item.id]) details[item.id].error = null;
   } catch (error) {
     if (details[item.id]) details[item.id].error = error.message;

@@ -1,14 +1,17 @@
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useAuthStore } from "../stores/auth";
 
 // Wishlist calls use the user's own token, so they draw from that user's
 // per-token Untappd quota, not the app's shared anonymous one.
-const CACHE_KEY = "wishlist:v1";
+const CACHE_KEY = "wishlist:v2";
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const PAGE_SIZE = 50;
 const MAX_PAGES = 5;
 
-const bids = ref(new Set());
+// bid -> lowercased "<brewery> <beer>" (or null when only the bid is known).
+// Names let taplist rows match wishlist entries even before any Untappd
+// lookup has supplied a bid for the row.
+const entries = ref(new Map());
 const loading = ref(false);
 let wired = false;
 
@@ -17,11 +20,12 @@ export function useWishlist() {
 
   if (!wired) {
     wired = true;
+    localStorage.removeItem("wishlist:v1");
     watch(
       () => auth.token,
       (token, old) => {
         if (!token) {
-          bids.value = new Set();
+          entries.value = new Map();
           localStorage.removeItem(CACHE_KEY);
           return;
         }
@@ -32,13 +36,25 @@ export function useWishlist() {
     );
   }
 
+  const bids = computed(() => entries.value);
+  const names = computed(
+    () => new Set([...entries.value.values()].filter(Boolean))
+  );
+
+  function entryName(item) {
+    const brewery = item.brewery?.brewery_name ?? "";
+    const beer = item.beer?.beer_name ?? "";
+    const name = `${brewery} ${beer}`.trim().toLowerCase();
+    return name || null;
+  }
+
   async function refresh({ force = false } = {}) {
     if (!auth.token || loading.value) return;
     if (!force) {
       try {
         const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
         if (cached?.t && Date.now() - cached.t < CACHE_TTL_MS) {
-          bids.value = new Set(cached.bids);
+          entries.value = new Map(cached.items);
           return;
         }
       } catch {
@@ -57,20 +73,20 @@ export function useWishlist() {
         const json = await response.json().catch(() => null);
         if (json?.meta?.code !== 200) break;
         const items = json.response?.beers?.items ?? [];
-        found.push(...items.map((item) => item.beer.bid));
+        found.push(...items.map((item) => [item.beer.bid, entryName(item)]));
         if (items.length < PAGE_SIZE) {
           complete = true;
           break;
         }
       }
-      if (found.length > 0 || complete) bids.value = new Set(found);
+      if (found.length > 0 || complete) entries.value = new Map(found);
       // A partial fetch (rate limited mid-pagination) stays uncached so the
       // next session retries.
       if (complete) {
         try {
           localStorage.setItem(
             CACHE_KEY,
-            JSON.stringify({ t: Date.now(), bids: found })
+            JSON.stringify({ t: Date.now(), items: found })
           );
         } catch {
           // caching is best-effort
@@ -82,9 +98,9 @@ export function useWishlist() {
   }
 
   // Returns the new state (true = on the wishlist).
-  async function toggle(bid) {
+  async function toggle(bid, name) {
     if (!auth.token || !bid) return undefined;
-    const on = bids.value.has(bid);
+    const on = entries.value.has(bid);
     const action = on ? "delete" : "add";
     let json;
     try {
@@ -100,10 +116,10 @@ export function useWishlist() {
         json?.meta?.error_detail || "Untappd wishlist update failed."
       );
     }
-    const next = new Set(bids.value);
+    const next = new Map(entries.value);
     if (on) next.delete(bid);
-    else next.add(bid);
-    bids.value = next;
+    else next.set(bid, name?.trim().toLowerCase() || null);
+    entries.value = next;
     // Sync an existing cache entry without extending its TTL; a partial
     // fetch has no entry and stays uncached.
     try {
@@ -111,7 +127,7 @@ export function useWishlist() {
       if (cached?.t) {
         localStorage.setItem(
           CACHE_KEY,
-          JSON.stringify({ t: cached.t, bids: [...next] })
+          JSON.stringify({ t: cached.t, items: [...next] })
         );
       }
     } catch {
@@ -120,5 +136,5 @@ export function useWishlist() {
     return !on;
   }
 
-  return { bids, loading, refresh, toggle };
+  return { bids, names, loading, refresh, toggle };
 }
