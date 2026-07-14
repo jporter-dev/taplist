@@ -4,7 +4,7 @@
       {{ auth.user.user_name }}'s Recent Check-ins
     </v-list-subheader>
     <v-list-item
-      v-for="item in auth.user.checkins.items"
+      v-for="item in auth.user.checkins?.items ?? []"
       :key="item.checkin_id"
       target="_blank"
       rel="noopener noreferrer"
